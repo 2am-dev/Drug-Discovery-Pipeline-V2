@@ -4,55 +4,71 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-        content="An autonomous multi-agent drug discovery pipeline — from disease
-                 indication to project proposal report, no human intervention required." />
-  <meta property="og:title"        content="Drug Discovery Pipeline V2" />
-  <meta property="og:description"  content="Hypothesis-to-Report · Multi-Agent · Ollama · RDKit" />
-  <meta property="og:url"          content="https://2am-dev.github.io/Drug-Discovery-Pipeline-V2/" />
-  <meta property="og:type"         content="website" />
+        content="An autonomous multi-agent drug discovery pipeline. From disease
+                 indication to full project proposal — zero human intervention." />
+  <meta property="og:title"       content="Drug Discovery Pipeline V2" />
+  <meta property="og:description" content="Hypothesis-to-Report · Multi-Agent · Ollama · RDKit" />
+  <meta property="og:url"         content="https://2am-dev.github.io/Drug-Discovery-Pipeline-V2/" />
+  <meta property="og:type"        content="website" />
   <title>Drug Discovery Pipeline V2</title>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+
   <style>
-    /* ── Reset ──────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    /* ── Design Tokens ──────────────────────────────── */
+    /* ═══════════════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════════════ */
     :root {
-      --bg:           #0d1117;
-      --bg-alt:       #010409;
-      --surface:      #161b22;
-      --surface2:     #21262d;
-      --border:       #30363d;
-      --border-hover: #6e7681;
+      --bg:            #020408;
+      --bg-card:       #080d14;
+      --bg-card2:      #0c1220;
+      --border:        rgba(255,255,255,.07);
+      --border-bright: rgba(255,255,255,.14);
 
-      --accent:       #238636;
-      --accent-hover: #2ea043;
-      --accent-glow:  rgba(35,134,54,0.35);
+      --green:         #00d084;
+      --green-dim:     #00a066;
+      --green-glow:    rgba(0,208,132,.18);
+      --blue:          #3b82f6;
+      --blue-dim:      #2563eb;
+      --blue-glow:     rgba(59,130,246,.18);
+      --purple:        #a855f7;
+      --purple-glow:   rgba(168,85,247,.18);
+      --cyan:          #22d3ee;
+      --amber:         #f59e0b;
 
-      --blue:         #1f6feb;
-      --blue-subtle:  #161b22;
-      --purple:       #8b949e;
+      --text:          #f1f5f9;
+      --text-2:        #94a3b8;
+      --text-3:        #475569;
 
-      --text:         #e6edf3;
-      --text-muted:   #8b949e;
-      --text-subtle:  #6e7681;
+      --radius-sm:  6px;
+      --radius:     12px;
+      --radius-lg:  20px;
+      --radius-xl:  28px;
 
-      --tag-bg:       #1c2a16;
-      --tag-text:     #56d364;
-      --tag-border:   rgba(46,160,67,.3);
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
 
-      --radius-sm:    6px;
-      --radius:       10px;
-      --radius-lg:    16px;
-
-      --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
-              Arial, sans-serif;
-
-      --transition: 0.2s ease;
+      --ease-out-expo: cubic-bezier(.16,1,.3,1);
+      --ease-spring:   cubic-bezier(.34,1.56,.64,1);
     }
 
-    html { scroll-behavior: smooth; }
+    /* ═══════════════════════════════════════════════════
+       RESET + BASE
+    ═══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: #1e293b transparent;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
 
     body {
       background: var(--bg);
@@ -60,158 +76,231 @@
       font-family: var(--sans);
       line-height: 1.6;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    a { color: var(--blue); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: var(--sans); }
 
-    img { max-width: 100%; height: auto; }
-
-    /* ── Utility ─────────────────────────────────────── */
     .sr-only {
       position: absolute; width: 1px; height: 1px;
       padding: 0; margin: -1px; overflow: hidden;
-      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+      clip: rect(0,0,0,0); border: 0;
     }
 
-    /* ── Skip Link ───────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════
+       CANVAS BACKGROUND
+    ═══════════════════════════════════════════════════ */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .55;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       NOISE OVERLAY
+    ═══════════════════════════════════════════════════ */
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: .032;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 128px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LAYOUT WRAPPER
+    ═══════════════════════════════════════════════════ */
+    .page { position: relative; z-index: 2; }
+
+    /* ═══════════════════════════════════════════════════
+       SKIP LINK
+    ═══════════════════════════════════════════════════ */
     .skip-link {
-      position: absolute;
-      top: -40px; left: 0;
-      background: var(--accent);
-      color: #fff;
-      padding: 0.5rem 1rem;
-      border-radius: 0 0 var(--radius-sm) 0;
+      position: fixed;
+      top: -60px; left: 1rem;
+      background: var(--green);
+      color: #000;
+      padding: .5rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
       z-index: 9999;
-      font-weight: 600;
-      transition: top var(--transition);
+      transition: top .2s;
     }
-    .skip-link:focus { top: 0; }
+    .skip-link:focus { top: .75rem; }
 
-    /* ── Navigation ──────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════
+       NAVIGATION
+    ═══════════════════════════════════════════════════ */
     nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(13,17,23,.92);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 500;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 60px;
+      padding: 0 2rem;
+      transition: background .4s, border-color .4s, backdrop-filter .4s;
     }
 
-    .nav-brand {
-      font-weight: 700;
-      font-size: .95rem;
-      color: var(--text);
+    nav.scrolled {
+      background: rgba(2,4,8,.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
       display: flex;
       align-items: center;
-      gap: .5rem;
-      white-space: nowrap;
+      gap: .65rem;
+      font-weight: 800;
+      font-size: .95rem;
+      letter-spacing: -.01em;
     }
 
-    .nav-brand svg { flex-shrink: 0; }
+    .nav-logo-icon {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--green) 0%, var(--blue) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px var(--green-glow);
+    }
+
+    .nav-v { color: var(--text-3); font-weight: 500; margin-left: .15rem; }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1.4rem;
+      gap: .25rem;
       list-style: none;
     }
 
     .nav-links a {
-      color: var(--text-muted);
-      font-size: .88rem;
-      transition: color var(--transition);
+      padding: .45rem .8rem;
+      border-radius: var(--radius-sm);
+      font-size: .86rem;
+      font-weight: 500;
+      color: var(--text-2);
+      transition: color .2s, background .2s;
     }
-    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+    }
 
-    .nav-gh {
+    .nav-cta {
       display: flex;
       align-items: center;
-      gap: .35rem;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: .35rem .75rem;
+      gap: .4rem;
+      padding: .45rem 1rem !important;
+      background: rgba(255,255,255,.08) !important;
+      border: 1px solid var(--border-bright) !important;
+      border-radius: var(--radius-sm) !important;
       color: var(--text) !important;
-      font-size: .82rem;
-      font-weight: 600;
-      transition: border-color var(--transition), background var(--transition);
+      font-weight: 600 !important;
+      transition: background .2s, border-color .2s, transform .2s !important;
     }
-    .nav-gh:hover {
-      background: var(--border);
-      text-decoration: none !important;
-      border-color: var(--border-hover);
-    }
-
-    /* ── Hero ────────────────────────────────────────── */
-    .hero-wrap {
-      position: relative;
-      overflow: hidden;
+    .nav-cta:hover {
+      background: rgba(255,255,255,.14) !important;
+      border-color: rgba(255,255,255,.25) !important;
+      transform: translateY(-1px) !important;
     }
 
-    /* subtle dot-grid background */
-    .hero-wrap::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
-      background-size: 32px 32px;
-      pointer-events: none;
-    }
-
-    /* bottom fade into page bg */
-    .hero-wrap::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 120px;
-      background: linear-gradient(to bottom, transparent, var(--bg));
-      pointer-events: none;
-    }
-
+    /* ═══════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════ */
     .hero {
-      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 6rem 2rem 5rem;
-      max-width: 860px;
-      margin: 0 auto;
+      padding: 8rem 2rem 6rem;
+      position: relative;
     }
 
-    .hero-badge {
+    /* Radial glow behind hero text */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 20%; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse,
+        rgba(0,208,132,.1) 0%,
+        rgba(59,130,246,.06) 45%,
+        transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: .5rem;
-      background: var(--tag-bg);
-      color: var(--tag-text);
-      border: 1px solid var(--tag-border);
+      border: 1px solid rgba(0,208,132,.3);
+      background: rgba(0,208,132,.07);
+      color: var(--green);
       border-radius: 50px;
-      padding: .3rem 1rem;
+      padding: .35rem 1rem;
       font-size: .78rem;
       font-weight: 700;
-      letter-spacing: .06em;
+      letter-spacing: .08em;
       text-transform: uppercase;
-      margin-bottom: 1.6rem;
+      margin-bottom: 2rem;
+      animation: fadeSlideDown .8s var(--ease-out-expo) both;
     }
 
-    .hero h1 {
-      font-size: clamp(2rem, 6vw, 3.4rem);
-      font-weight: 800;
-      line-height: 1.12;
-      margin-bottom: 1.2rem;
-      background: linear-gradient(140deg, #e6edf3 20%, #6e7681 100%);
+    .eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .5; transform: scale(.7); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -.04em;
+      margin-bottom: 1.6rem;
+      animation: fadeSlideUp .9s var(--ease-out-expo) .1s both;
+    }
+
+    .hero-title .line1 { display: block; color: var(--text); }
+
+    .hero-title .line2 {
+      display: block;
+      background: linear-gradient(135deg,
+        var(--green) 0%, var(--cyan) 40%, var(--blue) 80%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      filter: drop-shadow(0 0 40px rgba(0,208,132,.35));
     }
 
-    .hero p {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 580px;
-      margin: 0 auto 2.4rem;
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--text-2);
+      max-width: 560px;
+      margin: 0 auto 2.8rem;
+      line-height: 1.7;
+      font-weight: 400;
+      animation: fadeSlideUp 1s var(--ease-out-expo) .2s both;
     }
 
     .hero-actions {
@@ -219,338 +308,609 @@
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 2.8rem;
+      margin-bottom: 3.5rem;
+      animation: fadeSlideUp 1s var(--ease-out-expo) .3s both;
     }
 
-    /* ── Buttons ─────────────────────────────────────── */
+    /* ── Buttons ───────────── */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: .45rem;
-      padding: .65rem 1.4rem;
-      border-radius: var(--radius-sm);
-      font-size: .92rem;
+      gap: .5rem;
+      padding: .75rem 1.6rem;
+      border-radius: var(--radius);
+      font-size: .94rem;
       font-weight: 600;
-      cursor: pointer;
       border: none;
-      font-family: var(--sans);
-      transition: transform var(--transition), box-shadow var(--transition),
-                  background var(--transition), border-color var(--transition);
+      transition: transform .25s var(--ease-spring),
+                  box-shadow .25s ease,
+                  background .2s, border-color .2s;
+      position: relative;
+      overflow: hidden;
     }
 
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(255,255,255,.1), transparent);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .btn:hover::after { opacity: 1; }
+
     .btn:focus-visible {
-      outline: 2px solid var(--blue);
-      outline-offset: 2px;
+      outline: 2px solid var(--green);
+      outline-offset: 3px;
     }
 
     .btn-primary {
-      background: var(--accent);
-      color: #fff;
+      background: linear-gradient(135deg, var(--green) 0%, #00b870 100%);
+      color: #001a0e;
+      box-shadow: 0 0 0 rgba(0,208,132,0);
     }
     .btn-primary:hover {
-      background: var(--accent-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 18px var(--accent-glow);
-      text-decoration: none;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 30px var(--green-glow),
+                  0 0 60px rgba(0,208,132,.1);
     }
 
-    .btn-secondary {
-      background: var(--surface2);
+    .btn-ghost {
+      background: rgba(255,255,255,.06);
       color: var(--text);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-bright);
     }
-    .btn-secondary:hover {
-      background: var(--border);
-      border-color: var(--border-hover);
-      transform: translateY(-1px);
-      text-decoration: none;
+    .btn-ghost:hover {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.22);
+      transform: translateY(-2px);
     }
 
-    /* ── Badges row ──────────────────────────────────── */
-    .badges {
+    /* ── Badge strip ─────── */
+    .hero-badges {
       display: flex;
       justify-content: center;
       gap: .5rem;
       flex-wrap: wrap;
+      animation: fadeIn 1s ease .5s both;
     }
-    .badges img { height: 22px; border-radius: 3px; }
+    .hero-badges img { height: 22px; border-radius: 3px; }
 
-    /* ── Divider ─────────────────────────────────────── */
-    .divider { border: none; border-top: 1px solid var(--border); }
+    /* ── Scroll hint ─────── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      color: var(--text-3);
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      animation: fadeIn 1.5s ease 1s both;
+    }
 
-    /* ── Sections ────────────────────────────────────── */
-    section {
-      max-width: 1040px;
+    .scroll-mouse {
+      width: 22px; height: 34px;
+      border: 2px solid var(--text-3);
+      border-radius: 11px;
+      position: relative;
+    }
+    .scroll-mouse::after {
+      content: '';
+      position: absolute;
+      top: 5px; left: 50%;
+      transform: translateX(-50%);
+      width: 3px; height: 6px;
+      background: var(--text-3);
+      border-radius: 2px;
+      animation: scrollDot 1.6s ease-in-out infinite;
+    }
+
+    @keyframes scrollDot {
+      0%   { top: 5px; opacity: 1; }
+      100% { top: 17px; opacity: 0; }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SECTION LAYOUT
+    ═══════════════════════════════════════════════════ */
+    .section {
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 4.5rem 2rem;
+      padding: 6rem 2rem;
     }
 
     .section-label {
-      font-size: .72rem;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      font-size: .7rem;
       font-weight: 700;
-      letter-spacing: .12em;
+      letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: .55rem;
+      color: var(--green);
+      margin-bottom: .8rem;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 18px; height: 2px;
+      background: var(--green);
+      border-radius: 2px;
     }
 
     .section-title {
-      font-size: clamp(1.4rem, 3vw, 2rem);
-      font-weight: 700;
-      margin-bottom: .8rem;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin-bottom: .9rem;
     }
 
     .section-sub {
-      color: var(--text-muted);
-      max-width: 620px;
-      margin-bottom: 2.5rem;
-      font-size: .975rem;
+      color: var(--text-2);
+      font-size: 1.05rem;
+      max-width: 580px;
+      margin-bottom: 3rem;
+      line-height: 1.7;
     }
 
-    /* ── Pipeline Grid ───────────────────────────────── */
-    .pipeline {
+    /* Horizontal rule */
+    .hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent, var(--border-bright) 30%,
+        var(--border-bright) 70%, transparent);
+      margin: 0 2rem;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       STATS ROW
+    ═══════════════════════════════════════════════════ */
+    .stats-row {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 1rem;
-    }
-
-    .phase-card {
-      background: var(--surface);
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      transition: border-color var(--transition), transform var(--transition),
-                  box-shadow var(--transition);
-      cursor: default;
-    }
-    .phase-card:hover {
-      border-color: var(--blue);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(31,111,235,.15);
-    }
-
-    .phase-icon { font-size: 1.7rem; margin-bottom: .65rem; }
-
-    .phase-number {
-      font-size: .7rem;
-      font-weight: 700;
-      color: var(--blue);
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      margin-bottom: .35rem;
-    }
-
-    .phase-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
-    .phase-card p  { font-size: .85rem; color: var(--text-muted); }
-
-    .phase-optional {
-      display: inline-block;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: .68rem;
-      font-weight: 700;
-      color: var(--text-subtle);
-      padding: .1rem .45rem;
-      margin-left: .5rem;
-      vertical-align: middle;
-      letter-spacing: .05em;
-    }
-
-    /* ── Features Grid ───────────────────────────────── */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 1rem;
-    }
-
-    .feature {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      transition: border-color var(--transition), transform var(--transition);
-    }
-    .feature:hover {
-      border-color: var(--border-hover);
-      transform: translateY(-1px);
-    }
-
-    .feature-icon {
-      font-size: 1.5rem;
-      margin-bottom: .9rem;
-      display: block;
-    }
-
-    .feature h3 {
-      font-size: .93rem;
-      font-weight: 700;
-      margin-bottom: .4rem;
-    }
-
-    .feature p {
-      font-size: .85rem;
-      color: var(--text-muted);
-    }
-
-    /* ── Code / Tabs ─────────────────────────────────── */
-    .code-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       overflow: hidden;
     }
 
-    .code-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface2);
-      overflow-x: auto;
-      scrollbar-width: none;
+    .stat {
+      background: var(--bg-card);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+      transition: background .25s;
     }
-    .code-tabs::-webkit-scrollbar { display: none; }
+    .stat:hover { background: var(--bg-card2); }
 
-    .code-tab {
-      padding: .65rem 1.1rem;
-      font-size: .84rem;
+    .stat::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .stat:hover::after { opacity: 1; }
+
+    .stat-num {
+      font-size: 2.6rem;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--text) 0%, var(--text-2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      margin-bottom: .4rem;
+    }
+    .stat-label {
+      font-size: .78rem;
+      color: var(--text-3);
       font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      border: none;
-      border-bottom: 2px solid transparent;
-      background: transparent;
-      font-family: var(--sans);
-      transition: color var(--transition), border-color var(--transition);
-      white-space: nowrap;
-    }
-    .code-tab:hover { color: var(--text); }
-    .code-tab.active {
-      color: var(--text);
-      border-bottom-color: var(--blue);
-    }
-    .code-tab:focus-visible {
-      outline: 2px solid var(--blue);
-      outline-offset: -2px;
+      letter-spacing: .02em;
     }
 
-    .code-body { padding: 1.5rem; overflow-x: auto; }
-
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-
-    .code-body pre {
-      font-family: var(--mono);
-      font-size: .84rem;
-      line-height: 1.75;
-      color: #e6edf3;
+    /* ═══════════════════════════════════════════════════
+       PIPELINE — VERTICAL TIMELINE
+    ═══════════════════════════════════════════════════ */
+    .pipeline-wrap {
+      position: relative;
+      display: grid;
+      gap: 1.5rem;
     }
 
-    /* Syntax colours */
-    .c-comment { color: #8b949e; font-style: italic; }
-    .c-cmd     { color: #56d364; }
-    .c-flag    { color: #79c0ff; }
-    .c-string  { color: #a5d6ff; }
-    .c-key     { color: #ff7b72; }
-    .c-val     { color: #ffa657; }
+    /* vertical spine */
+    .pipeline-wrap::before {
+      content: '';
+      position: absolute;
+      left: 28px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg,
+        var(--green) 0%, var(--blue) 60%, var(--purple) 100%);
+      opacity: .3;
+      border-radius: 2px;
+    }
 
-    /* inline code */
-    code {
-      background: var(--surface2);
+    .phase {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .phase-num-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 1.2rem;
+    }
+
+    .phase-dot {
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      border: 2px solid var(--border-bright);
+      background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      position: relative;
+      z-index: 1;
+      transition: border-color .3s, box-shadow .3s, transform .3s;
+      flex-shrink: 0;
+    }
+
+    .phase:hover .phase-dot {
+      border-color: var(--green);
+      box-shadow: 0 0 20px var(--green-glow);
+      transform: scale(1.08);
+    }
+
+    .phase-body {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: .15em .45em;
-      font-family: var(--mono);
-      font-size: .84em;
-      color: #a5d6ff;
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+    }
+    .phase:hover .phase-body {
+      border-color: var(--border-bright);
+      transform: translateX(4px);
+      box-shadow: 0 4px 30px rgba(0,0,0,.4);
     }
 
-    /* ── Copy button ─────────────────────────────────── */
-    .code-header {
+    .phase-tag {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: .5rem;
+    }
+
+    .phase-body h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: .5rem;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: .6rem 1rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface2);
+      gap: .6rem;
     }
 
-    .code-lang {
-      font-size: .75rem;
+    .phase-optional-tag {
+      background: rgba(168,85,247,.15);
+      border: 1px solid rgba(168,85,247,.3);
+      color: var(--purple);
+      border-radius: 4px;
+      font-size: .65rem;
       font-weight: 700;
-      color: var(--text-subtle);
-      letter-spacing: .08em;
+      padding: .1rem .4rem;
+      letter-spacing: .06em;
       text-transform: uppercase;
     }
 
-    .copy-btn {
+    .phase-body p {
+      color: var(--text-2);
+      font-size: .9rem;
+      line-height: 1.65;
+    }
+
+    .phase-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-top: 1rem;
+    }
+
+    .pill {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: .2rem .65rem;
+      font-size: .72rem;
+      font-weight: 500;
+      color: var(--text-2);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FEATURES BENTO GRID
+    ═══════════════════════════════════════════════════ */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto;
+      gap: 1rem;
+    }
+
+    .bento-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .3s, transform .3s, box-shadow .3s;
+    }
+
+    /* Hover shimmer */
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255,255,255,.04), transparent 40%);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    .bento-card:hover::before { opacity: 1; }
+
+    .bento-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5);
+    }
+
+    /* Accent top-border on hover */
+    .bento-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--card-accent, linear-gradient(90deg,var(--green),var(--blue)));
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .bento-card:hover::after { opacity: 1; }
+
+    /* Size variants */
+    .bento-wide  { grid-column: span 2; }
+    .bento-tall  { grid-row: span 2; }
+
+    .bento-icon {
+      font-size: 2rem;
+      margin-bottom: 1.1rem;
+      display: block;
+    }
+
+    .bento-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: .5rem;
+    }
+
+    .bento-card p {
+      font-size: .875rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* Mini flow diagram inside bento card */
+    .mini-flow {
+      margin-top: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    .mini-flow-row {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .8rem;
+      font-family: var(--mono);
+    }
+
+    .mini-badge {
+      width: 22px; height: 22px;
+      border-radius: 5px;
+      font-size: .67rem;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mb-green  { background: rgba(0,208,132,.2);  color: var(--green); }
+    .mb-yellow { background: rgba(245,158,11,.2);  color: var(--amber); }
+    .mb-red    { background: rgba(239,68,68,.2);   color: #ef4444; }
+
+    .mini-flow-connector {
+      padding-left: .8rem;
+      color: var(--text-3);
+      font-size: .72rem;
+    }
+
+    /* Token bar inside bento */
+    .token-bars { margin-top: 1.4rem; display: grid; gap: .9rem; }
+
+    .t-bar-row { display: grid; gap: .35rem; }
+
+    .t-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--text-2);
+    }
+
+    .t-bar-track {
+      height: 8px;
+      border-radius: 50px;
+      background: rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+
+    .t-bar-fill {
+      height: 100%;
+      border-radius: 50px;
+      transition: width 1.4s var(--ease-out-expo);
+      width: 0%;
+    }
+
+    .fill-green  { background: linear-gradient(90deg,var(--green),#00e89a); }
+    .fill-blue   { background: linear-gradient(90deg,var(--blue),var(--cyan)); }
+    .fill-amber  { background: linear-gradient(90deg,var(--amber),#fbbf24); }
+
+    /* ═══════════════════════════════════════════════════
+       CODE TERMINAL
+    ═══════════════════════════════════════════════════ */
+    .terminal {
+      background: #090e16;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    }
+
+    .term-bar {
+      display: flex;
+      align-items: center;
+      padding: .9rem 1.2rem;
+      background: #0d1421;
+      border-bottom: 1px solid var(--border);
+      gap: .85rem;
+    }
+
+    .term-dots {
+      display: flex; gap: .4rem;
+    }
+    .term-dot {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+    }
+    .td-red    { background: #ff5f57; }
+    .td-yellow { background: #ffbd2e; }
+    .td-green  { background: #28c840; }
+
+    .term-title {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--text-3);
+      flex: 1;
+      text-align: center;
+    }
+
+    .term-copy {
       display: flex;
       align-items: center;
       gap: .3rem;
-      background: transparent;
+      background: rgba(255,255,255,.06);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      color: var(--text-muted);
+      color: var(--text-2);
       font-family: var(--sans);
-      font-size: .75rem;
-      padding: .25rem .6rem;
-      cursor: pointer;
-      transition: all var(--transition);
+      font-size: .73rem;
+      font-weight: 600;
+      padding: .25rem .65rem;
+      transition: all .2s;
     }
-    .copy-btn:hover {
-      background: var(--border);
-      color: var(--text);
-    }
-    .copy-btn.copied {
-      background: var(--tag-bg);
-      border-color: var(--tag-border);
-      color: var(--tag-text);
+    .term-copy:hover { background: rgba(255,255,255,.1); color: var(--text); }
+    .term-copy.copied {
+      background: rgba(0,208,132,.12);
+      border-color: rgba(0,208,132,.3);
+      color: var(--green);
     }
 
-    /* ── Connectivity Flow ───────────────────────────── */
-    .flow-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem 2rem 1.5rem;
-      font-family: var(--mono);
-      font-size: .875rem;
-    }
-
-    .flow-row {
+    .term-tabs {
       display: flex;
-      align-items: center;
-      gap: .9rem;
-      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+      background: #0d1421;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .term-tabs::-webkit-scrollbar { display: none; }
+
+    .term-tab {
+      padding: .6rem 1.1rem;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-3);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color .2s, border-color .2s;
+    }
+    .term-tab:hover { color: var(--text-2); }
+    .term-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--green);
     }
 
-    .flow-connector {
-      padding: .15rem 0 .15rem 1.1rem;
-      color: var(--text-subtle);
-      font-size: .8rem;
-      line-height: 1.4;
+    .term-body {
+      padding: 1.6rem;
+      overflow-x: auto;
+      min-height: 200px;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 26px;
-      height: 26px;
-      border-radius: var(--radius-sm);
-      font-size: .75rem;
-      font-weight: 700;
-      flex-shrink: 0;
-      padding: 0 .4rem;
-    }
-    .badge-blue    { background: var(--blue);  color: #fff; }
-    .badge-yellow  { background: #d29922;      color: #000; }
-    .badge-red     { background: #da3633;      color: #fff; }
+    .term-panel { display: none; }
+    .term-panel.active { display: block; }
 
-    /* ── Config Table ────────────────────────────────── */
-    .table-wrap {
-      background: var(--surface);
+    pre {
+      font-family: var(--mono);
+      font-size: .84rem;
+      line-height: 1.8;
+      color: #cdd9e5;
+    }
+
+    /* Syntax tokens */
+    .t-comment { color: #475569; font-style: italic; }
+    .t-cmd     { color: var(--green); }
+    .t-flag    { color: #79c0ff; }
+    .t-str     { color: #a5d6ff; }
+    .t-key     { color: #ff7b72; }
+    .t-val     { color: #ffa657; }
+    .t-prompt  { color: var(--text-3); user-select: none; }
+
+    /* Typewriter cursor blink */
+    .cursor {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--green);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink .9s step-end infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ═══════════════════════════════════════════════════
+       CONFIG TABLE
+    ═══════════════════════════════════════════════════ */
+    .config-wrap {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       overflow: hidden;
       overflow-x: auto;
     }
@@ -563,236 +923,327 @@
 
     thead th {
       text-align: left;
-      padding: .75rem 1rem;
-      background: var(--surface2);
-      color: var(--text-muted);
-      font-size: .75rem;
+      padding: .85rem 1.2rem;
+      background: rgba(255,255,255,.03);
+      color: var(--text-3);
+      font-size: .72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .1em;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
 
     tbody td {
-      padding: .7rem 1rem;
+      padding: .8rem 1.2rem;
       border-bottom: 1px solid var(--border);
       vertical-align: top;
     }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: var(--surface2); }
+    tbody tr { transition: background .15s; }
+    tbody tr:hover td { background: rgba(255,255,255,.025); }
 
-    td:first-child code { color: #ffa657; }
+    code {
+      font-family: var(--mono);
+      font-size: .82em;
+      border-radius: 5px;
+      padding: .15em .45em;
+    }
 
-    /* ── Stats Bar ───────────────────────────────────── */
-    .stats {
+    .code-var  { background: rgba(255,123,114,.1);  color: #ff7b72; }
+    .code-def  { background: rgba(165,214,255,.08); color: #a5d6ff; }
+    .code-note { background: rgba(0,208,132,.08);   color: var(--green); }
+
+    /* ═══════════════════════════════════════════════════
+       JSON SHOWCASE
+    ═══════════════════════════════════════════════════ */
+    .json-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1px;
-      background: var(--border);
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1rem;
+    }
+
+    .json-card {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      margin-bottom: 2.5rem;
+      transition: border-color .3s, transform .3s;
+    }
+    .json-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
     }
 
-    .stat {
-      background: var(--surface);
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #e6edf3, #8b949e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: block;
-    }
-
-    .stat-label {
-      font-size: .8rem;
-      color: var(--text-muted);
-      margin-top: .2rem;
-    }
-
-    /* ── Token Budget ────────────────────────────────── */
-    .budget-bar-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-    }
-
-    .budget-bar {
-      height: 12px;
-      border-radius: 50px;
-      background: var(--surface2);
-      overflow: hidden;
-      margin: .8rem 0;
-      position: relative;
-    }
-
-    .budget-fill {
-      height: 100%;
-      border-radius: 50px;
-      background: linear-gradient(90deg, var(--accent) 0%, #56d364 100%);
-      transition: width 1.2s cubic-bezier(.25,.8,.25,1);
-    }
-
-    .budget-labels {
+    .json-card-header {
+      padding: .75rem 1.2rem;
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
+      align-items: center;
+      gap: .6rem;
       font-size: .78rem;
-      color: var(--text-muted);
+      font-weight: 700;
+      color: var(--text-2);
     }
 
-    /* ── Footer ──────────────────────────────────────── */
+    .json-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    .json-card pre {
+      padding: 1.2rem;
+      font-size: .78rem;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .j-key   { color: #79c0ff; }
+    .j-str   { color: #a5d6ff; }
+    .j-num   { color: #ffa657; }
+    .j-bool  { color: var(--green); }
+    .j-punct { color: var(--text-3); }
+
+    /* ═══════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════ */
     footer {
       border-top: 1px solid var(--border);
+      padding: 3.5rem 2rem;
       text-align: center;
-      padding: 2.5rem 2rem;
-      color: var(--text-muted);
-      font-size: .875rem;
     }
 
-    footer a { color: var(--text-muted); }
-    footer a:hover { color: var(--text); text-decoration: none; }
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .4rem .8rem;
+      margin-bottom: 1.5rem;
+      font-size: .85rem;
+    }
+    .footer-links a {
+      color: var(--text-3);
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-sep { color: var(--text-3); }
 
     .footer-stack {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: .4rem .8rem;
-      margin-top: .6rem;
+      gap: .5rem;
+      margin-bottom: 1.5rem;
     }
 
     .stack-pill {
-      background: var(--surface);
+      background: rgba(255,255,255,.04);
       border: 1px solid var(--border);
       border-radius: 50px;
-      padding: .2rem .7rem;
+      padding: .28rem .8rem;
       font-size: .75rem;
-      color: var(--text-muted);
-      transition: border-color var(--transition), color var(--transition);
+      color: var(--text-3);
+      transition: all .2s;
     }
     .stack-pill:hover {
-      border-color: var(--border-hover);
-      color: var(--text);
+      background: rgba(255,255,255,.08);
+      border-color: var(--border-bright);
+      color: var(--text-2);
     }
 
-    /* ── Scroll-reveal ───────────────────────────────── */
+    .footer-copy {
+      font-size: .78rem;
+      color: var(--text-3);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       BACK TO TOP
+    ═══════════════════════════════════════════════════ */
+    #btt {
+      position: fixed;
+      bottom: 1.8rem; right: 1.8rem;
+      width: 44px; height: 44px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-2);
+      font-size: 1.1rem;
+      z-index: 400;
+      opacity: 0;
+      transform: translateY(12px) scale(.9);
+      transition: opacity .3s, transform .3s, background .2s, border-color .2s;
+      pointer-events: none;
+    }
+    #btt.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    #btt:hover {
+      background: rgba(255,255,255,.1);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════════════ */
     .reveal {
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity .6s ease, transform .6s ease;
+      transform: translateY(28px);
+      transition: opacity .75s var(--ease-out-expo),
+                  transform .75s var(--ease-out-expo);
     }
     .reveal.visible {
       opacity: 1;
       transform: translateY(0);
     }
 
-    /* ── Responsive ──────────────────────────────────── */
-    @media (max-width: 700px) {
-      nav { padding: 0 1rem; }
-      .nav-links { gap: .8rem; }
-      .nav-links li.hide-sm { display: none; }
-      section { padding: 3rem 1rem; }
-      .hero { padding: 4rem 1rem 3.5rem; }
-      .flow-box { padding: 1.2rem; font-size: .78rem; }
+    /* Stagger children */
+    .reveal-stagger > * {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .6s var(--ease-out-expo),
+                  transform .6s var(--ease-out-expo);
+    }
+    .reveal-stagger.visible > *:nth-child(1) { transition-delay: .05s; }
+    .reveal-stagger.visible > *:nth-child(2) { transition-delay: .12s; }
+    .reveal-stagger.visible > *:nth-child(3) { transition-delay: .19s; }
+    .reveal-stagger.visible > *:nth-child(4) { transition-delay: .26s; }
+    .reveal-stagger.visible > *:nth-child(5) { transition-delay: .33s; }
+    .reveal-stagger.visible > *:nth-child(n+6) { transition-delay: .4s; }
+    .reveal-stagger.visible > * {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    /* ── Back-to-top ─────────────────────────────────── */
-    #btt {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      width: 40px;
-      height: 40px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.1rem;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity var(--transition), transform var(--transition),
-                  background var(--transition);
-      z-index: 90;
+    /* ═══════════════════════════════════════════════════
+       KEYFRAMES
+    ═══════════════════════════════════════════════════ */
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    #btt.visible { opacity: 1; transform: translateY(0); }
-    #btt:hover { background: var(--border); }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .bento { grid-template-columns: repeat(2,1fr); }
+      .bento-wide  { grid-column: span 2; }
+      .stats-row { grid-template-columns: repeat(3,1fr); }
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links li.hide-sm { display: none; }
+      .section { padding: 4rem 1rem; }
+      .hero { padding: 6rem 1rem 5rem; }
+      .bento { grid-template-columns: 1fr; }
+      .bento-wide { grid-column: span 1; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .pipeline-wrap::before { left: 22px; }
+      .phase { grid-template-columns: 48px 1fr; gap: 1rem; }
+      .phase-dot { width: 46px; height: 46px; }
+      .json-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Skip nav for accessibility -->
-<a class="skip-link" href="#main">Skip to main content</a>
+<!-- Background canvas -->
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<!-- Noise -->
+<div class="noise" aria-hidden="true"></div>
 
-<!-- ── Navigation ──────────────────────────────────── -->
-<nav aria-label="Main navigation">
-  <div class="nav-brand">
-    <svg width="22" height="22" viewBox="0 0 24 24"
-         fill="none" stroke="#56d364" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round"
-         aria-hidden="true">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83
-               M16.24 16.24l2.83 2.83M2 12h4M18 12h4
-               M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-    </svg>
-    Drug Discovery Pipeline&nbsp;<span style="color:var(--text-subtle)">V2</span>
-  </div>
+<!-- Skip link -->
+<a class="skip-link" href="#main">Skip to content</a>
 
-  <ul class="nav-links" role="list">
-    <li class="hide-sm"><a href="#pipeline">Pipeline</a></li>
-    <li class="hide-sm"><a href="#features">Features</a></li>
-    <li class="hide-sm"><a href="#quickstart">Quick&nbsp;Start</a></li>
-    <li class="hide-sm"><a href="#config">Config</a></li>
-    <li>
-      <a class="nav-gh"
-         href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
-         target="_blank" rel="noopener noreferrer">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
-             aria-hidden="true">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205
-                   11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015
-                   -2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72
-                   -1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015
-                   1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105
-                   -.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925
-                   0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18
-                   0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135
-                   3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12
-                   3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625
-                   -5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015
-                   2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0
-                   24 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        GitHub
-      </a>
-    </li>
-  </ul>
-</nav>
+<div class="page">
 
-<!-- ── Hero ────────────────────────────────────────── -->
-<div class="hero-wrap">
-  <div class="hero" id="main">
-    <div class="hero-badge" aria-label="Multi-Agent Autonomous Pipeline">
-      ⚗️ &nbsp;Multi-Agent · Autonomous · End-to-End
+  <!-- ══════════════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════════════ -->
+  <nav id="nav" aria-label="Main navigation">
+    <div class="nav-logo">
+      <div class="nav-logo-icon" aria-hidden="true">⚗️</div>
+      Drug Discovery
+      <span class="nav-v">V2</span>
     </div>
 
-    <h1>Drug Discovery<br/>Hypothesis‑to‑Report</h1>
+    <ul class="nav-links" role="list">
+      <li class="hide-sm"><a href="#pipeline">Pipeline</a></li>
+      <li class="hide-sm"><a href="#features">Features</a></li>
+      <li class="hide-sm"><a href="#quickstart">Quick Start</a></li>
+      <li class="hide-sm"><a href="#config">Config</a></li>
+      <li>
+        <a class="nav-cta"
+           href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
+           target="_blank" rel="noopener noreferrer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"
+               aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795
+                     8.205 11.385.6.105.825-.255.825-.57 0-.285-.015
+                     -1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41
+                     -.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78
+                     -.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815
+                     2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605
+                     -2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385
+                     1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315
+                     3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405
+                     c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12
+                     3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805
+                     5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605
+                     -.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02
+                     12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </li>
+    </ul>
+  </nav>
 
-    <p>
-      Accept a disease indication or biological target — receive a
-      comprehensive project proposal report. Fully autonomous. No human
-      intervention required.
+  <!-- ══════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════ -->
+  <section class="hero" id="main" aria-label="Introduction">
+    <div class="hero-eyebrow" role="note">
+      <span class="eyebrow-dot" aria-hidden="true"></span>
+      Multi-Agent · Autonomous · End-to-End
+    </div>
+
+    <h1 class="hero-title">
+      <span class="line1">Drug Discovery</span>
+      <span class="line2">Pipeline V2</span>
+    </h1>
+
+    <p class="hero-sub">
+      Accept a disease indication or biological target.
+      Receive a comprehensive project proposal report.
+      Zero human intervention required.
     </p>
 
     <div class="hero-actions">
@@ -801,679 +1252,985 @@
          target="_blank" rel="noopener noreferrer">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"
              aria-hidden="true">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205
-                   11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015
-                   -2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72
-                   -1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015
-                   1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105
-                   -.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925
-                   0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18
-                   0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135
-                   3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12
-                   3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625
-                   -5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015
-                   2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0
-                   24 12c0-6.63-5.37-12-12-12z"/>
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795
+                   8.205 11.385.6.105.825-.255.825-.57 0-.285-.015
+                   -1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41
+                   -.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78
+                   -.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815
+                   2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605
+                   -2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385
+                   1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315
+                   3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405
+                   c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12
+                   3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805
+                   5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605
+                   -.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02
+                   12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
         </svg>
         View on GitHub
       </a>
-
-      <a class="btn btn-secondary" href="#quickstart">
+      <a class="btn btn-ghost" href="#quickstart">
         🚀 Quick Start
       </a>
-
-      <a class="btn btn-secondary"
+      <a class="btn btn-ghost"
          href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2/blob/main/README.md"
          target="_blank" rel="noopener noreferrer">
         📄 Full Docs
       </a>
     </div>
 
-    <div class="badges" aria-label="Tech badges">
-      <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white"
-           alt="Python 3.10+" />
-      <img src="https://img.shields.io/badge/Ollama-Remote%20%7C%20Local-10b981?style=flat-square"
-           alt="Ollama" />
-      <img src="https://img.shields.io/badge/Pydantic-v2-E92063?style=flat-square"
-           alt="Pydantic v2" />
-      <img src="https://img.shields.io/badge/RDKit-Cheminformatics-002366?style=flat-square"
-           alt="RDKit" />
-      <img src="https://img.shields.io/badge/ChromaDB-Vector%20Store-FF6B35?style=flat-square"
-           alt="ChromaDB" />
-      <img src="https://img.shields.io/badge/License-MIT-f5a623?style=flat-square"
-           alt="MIT License" />
+    <div class="hero-badges" aria-label="Technology badges">
+      <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+" />
+      <img src="https://img.shields.io/badge/Ollama-Remote%20%7C%20Local-00d084?style=flat-square" alt="Ollama" />
+      <img src="https://img.shields.io/badge/Pydantic-v2-E92063?style=flat-square" alt="Pydantic v2" />
+      <img src="https://img.shields.io/badge/RDKit-Cheminformatics-003087?style=flat-square" alt="RDKit" />
+      <img src="https://img.shields.io/badge/ChromaDB-VectorStore-FF6B35?style=flat-square" alt="ChromaDB" />
+      <img src="https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square" alt="MIT License" />
     </div>
-  </div>
-</div>
 
-<hr class="divider" />
-
-<!-- ── Stats ────────────────────────────────────────── -->
-<section aria-labelledby="stats-heading">
-  <h2 id="stats-heading" class="sr-only">Pipeline at a Glance</h2>
-
-  <div class="stats reveal">
-    <div class="stat">
-      <span class="stat-number">7</span>
-      <span class="stat-label">Pipeline Stages</span>
+    <div class="scroll-hint" aria-hidden="true">
+      <div class="scroll-mouse"></div>
+      <span>Scroll</span>
     </div>
-    <div class="stat">
-      <span class="stat-number">150</span>
-      <span class="stat-label">PubMed Abstracts</span>
-    </div>
-    <div class="stat">
-      <span class="stat-number">20</span>
-      <span class="stat-label">Molecules Generated</span>
-    </div>
-    <div class="stat">
-      <span class="stat-number">8K</span>
-      <span class="stat-label">Token Prompt Budget</span>
-    </div>
-    <div class="stat">
-      <span class="stat-number">0</span>
-      <span class="stat-label">Human Interventions</span>
-    </div>
-  </div>
-</section>
+  </section>
 
-<hr class="divider" />
-
-<!-- ── Pipeline Stages ──────────────────────────────── -->
-<section id="pipeline" aria-labelledby="pipeline-heading">
-  <div class="section-label" aria-hidden="true">Architecture</div>
-  <h2 id="pipeline-heading" class="section-title">Seven-Stage Pipeline</h2>
-  <p class="section-sub">
-    Every inter-agent communication uses strict JSON validated against
-    Pydantic schemas. No free-text is passed between stages.
-  </p>
-
-  <div class="pipeline">
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">🗂️</div>
-      <div class="phase-number">Phase 0</div>
-      <h3>Planner</h3>
-      <p>Builds the task dependency graph and estimates pipeline
-         duration before any scientific work begins.</p>
-    </article>
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">📚</div>
-      <div class="phase-number">Phase 1</div>
-      <h3>Literature &amp; Patent Retrieval</h3>
-      <p>Mines PubMed (up to 150 abstracts), arXiv preprints, and
-         PatentsView API. Embeddings stored in ChromaDB.</p>
-    </article>
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">🎯</div>
-      <div class="phase-number">Phase 2</div>
-      <h3>Hypothesis Generation</h3>
-      <p>Selects a primary biological target with UniProt / PDB IDs,
-         proposes a mechanistic hypothesis, and confidence-scores it.</p>
-    </article>
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">⚗️</div>
-      <div class="phase-number">Phase 3</div>
-      <h3>Molecule Design</h3>
-      <p>Generates up to 20 candidate molecules via RDKit, filters on
-         Lipinski rules, QED ≥ 0.5, and SA score ≤ 4.0.</p>
-    </article>
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">🔬</div>
-      <div class="phase-number">Phase 4</div>
-      <h3>Docking Evaluation</h3>
-      <p>Runs AutoDock Vina on the top-5 shortlisted molecules,
-         reporting ΔG (kcal/mol) and ligand efficiency.</p>
-    </article>
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">🧪</div>
-      <div class="phase-number">Phase 5
-        <span class="phase-optional">optional</span>
+  <!-- ══════════════════════════════════════════════
+       STATS
+  ══════════════════════════════════════════════ -->
+  <div class="section" style="padding-top:2rem; padding-bottom:2rem;">
+    <div class="stats-row reveal-stagger">
+      <div class="stat">
+        <span class="stat-num" data-count="7">7</span>
+        <span class="stat-label">Pipeline Stages</span>
       </div>
-      <h3>Synthesis Evaluation</h3>
-      <p>RDKit SA scores plus LLM-proposed step-by-step synthetic
-         routes for top-ranked molecules.</p>
-    </article>
-
-    <article class="phase-card reveal">
-      <div class="phase-icon" aria-hidden="true">📄</div>
-      <div class="phase-number">Phase 6</div>
-      <h3>Report Compilation</h3>
-      <p>Assembles all agent outputs into a structured Markdown (or
-         optional PDF) project proposal ready for review.</p>
-    </article>
-
+      <div class="stat">
+        <span class="stat-num" data-count="150">150</span>
+        <span class="stat-label">PubMed Abstracts</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-count="20">20</span>
+        <span class="stat-label">Molecules Generated</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">8K</span>
+        <span class="stat-label">Token Prompt Budget</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-count="0">0</span>
+        <span class="stat-label">Human Interventions</span>
+      </div>
+    </div>
   </div>
-</section>
 
-<hr class="divider" />
+  <hr class="hr" />
 
-<!-- ── Features ─────────────────────────────────────── -->
-<section id="features" aria-labelledby="features-heading">
-  <div class="section-label" aria-hidden="true">Features</div>
-  <h2 id="features-heading" class="section-title">What's Inside</h2>
-  <p class="section-sub">
-    A full-stack cheminformatics and AI stack running entirely on your
-    own hardware — no external AI APIs required.
-  </p>
+  <!-- ══════════════════════════════════════════════
+       PIPELINE
+  ══════════════════════════════════════════════ -->
+  <div class="section" id="pipeline">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">Seven-Stage Pipeline</h2>
+    <p class="section-sub">
+      Every inter-agent communication uses strict JSON validated against
+      Pydantic v2 schemas. No free-text passes between stages.
+    </p>
 
-  <div class="features">
+    <div class="pipeline-wrap">
 
-    <div class="feature reveal">
-      <span class="feature-icon" aria-hidden="true">🤖</span>
-      <h3>Smart Ollama Routing</h3>
-      <p>Automatically tries your remote GPU server first, falls back
-         to local Ollama within 5 seconds — zero manual switching.</p>
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">🗂️</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 0</div>
+          <h3>Planner</h3>
+          <p>Constructs the full task dependency graph and estimates
+             end-to-end pipeline duration before any scientific
+             computation begins.</p>
+          <div class="phase-pills">
+            <span class="pill">Task graph</span>
+            <span class="pill">Dependency resolution</span>
+            <span class="pill">ETA estimation</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">📚</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 1</div>
+          <h3>Literature &amp; Patent Retrieval</h3>
+          <p>Mines PubMed (up to 150 abstracts), arXiv preprints, and
+             the PatentsView API. Abstracts are batch-embedded (50 per
+             chunk) into ChromaDB for semantic retrieval.</p>
+          <div class="phase-pills">
+            <span class="pill">PubMed ESearch</span>
+            <span class="pill">arXiv</span>
+            <span class="pill">PatentsView</span>
+            <span class="pill">ChromaDB</span>
+            <span class="pill">nomic-embed-text</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">🎯</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 2</div>
+          <h3>Hypothesis Generation</h3>
+          <p>Selects the primary biological target, assigns UniProt and
+             PDB IDs, identifies binding-site residues, proposes a
+             mechanistic hypothesis, and scores confidence 0–1.</p>
+          <div class="phase-pills">
+            <span class="pill">UniProt REST</span>
+            <span class="pill">RCSB PDB</span>
+            <span class="pill">Confidence scoring</span>
+            <span class="pill">Alternative targets</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">⚗️</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 3</div>
+          <h3>Molecule Design</h3>
+          <p>Generates up to 20 de-novo SMILES, filters on Lipinski
+             rule-of-five, QED ≥ 0.5, SA score ≤ 4.0, and shortlists
+             the top 5 candidates for docking.</p>
+          <div class="phase-pills">
+            <span class="pill">RDKit</span>
+            <span class="pill">Lipinski filter</span>
+            <span class="pill">QED scoring</span>
+            <span class="pill">SA scoring</span>
+            <span class="pill">Scaffold decoration</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">🔬</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 4</div>
+          <h3>Docking Evaluation</h3>
+          <p>Runs AutoDock Vina on the top-5 shortlisted molecules
+             against the selected PDB receptor, reporting ΔG (kcal/mol),
+             ligand efficiency, and key binding interactions.</p>
+          <div class="phase-pills">
+            <span class="pill">AutoDock Vina</span>
+            <span class="pill">ΔG prediction</span>
+            <span class="pill">Ligand efficiency</span>
+            <span class="pill">Pose export</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">🧪</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 5</div>
+          <h3>
+            Synthesis Evaluation
+            <span class="phase-optional-tag">Optional</span>
+          </h3>
+          <p>Computes RDKit synthetic accessibility scores and leverages
+             the LLM to propose step-by-step synthetic routes for the
+             top-ranked molecules. Enabled via <code style="background:rgba(168,85,247,.1);color:var(--purple)">--enable-synthesis</code>.</p>
+          <div class="phase-pills">
+            <span class="pill">RDKit SA score</span>
+            <span class="pill">LLM route planning</span>
+            <span class="pill">Retrosynthesis hints</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase reveal">
+        <div class="phase-num-col">
+          <div class="phase-dot" aria-hidden="true">📄</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-tag">Phase 6</div>
+          <h3>Report Compilation</h3>
+          <p>Assembles every agent's validated output into a structured
+             Markdown project proposal. Optionally exports to PDF.
+             Ready for scientific review with zero editing required.</p>
+          <div class="phase-pills">
+            <span class="pill">Markdown report</span>
+            <span class="pill">PDF export</span>
+            <span class="pill">Full traceability</span>
+          </div>
+        </div>
+      </div>
+
     </div>
-
-    <div class="feature reveal">
-      <span class="feature-icon" aria-hidden="true">✅</span>
-      <h3>Strict JSON Validation</h3>
-      <p>All inter-agent messages validated against Pydantic v2 schemas
-         with up to 3 automatic retries on parse failures.</p>
-    </div>
-
-    <div class="feature reveal">
-      <span class="feature-icon" aria-hidden="true">🧬</span>
-      <h3>Real Cheminformatics</h3>
-      <p>RDKit-powered molecule generation, Lipinski filtering, QED
-         scoring, and synthetic accessibility checks.</p>
-    </div>
-
-    <div class="feature reveal">
-      <span class="feature-icon" aria-hidden="true">📐</span>
-      <h3>Token Budget Management</h3>
-      <p>8,000-token prompt budget with HuggingFace tokenizer primary
-         and tiktoken fallback. Auto-chunking for large literature.</p>
-    </div>
-
-    <div class="feature reveal">
-      <span class="feature-icon" aria-hidden="true">🔌</span>
-      <h3>External API Integration</h3>
-      <p>PubMed ESearch/EFetch, arXiv, PatentsView, UniProt REST, and
-         RCSB PDB — all wired up out of the box.</p>
-    </div>
-
-    <div class="feature reveal">
-      <span class="feature-icon" aria-hidden="true">🐳</span>
-      <h3>Docker Support</h3>
-      <p>Dockerfile and docker-compose included for fully reproducible
-         deployment across any environment.</p>
-    </div>
-
   </div>
-</section>
 
-<hr class="divider" />
+  <hr class="hr" />
 
-<!-- ── Quick Start ──────────────────────────────────── -->
-<section id="quickstart" aria-labelledby="qs-heading">
-  <div class="section-label" aria-hidden="true">Quick Start</div>
-  <h2 id="qs-heading" class="section-title">Up and Running in Minutes</h2>
-  <p class="section-sub">
-    Clone, point to your Ollama endpoint, and run — that's it.
-  </p>
+  <!-- ══════════════════════════════════════════════
+       FEATURES BENTO
+  ══════════════════════════════════════════════ -->
+  <div class="section" id="features">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything You Need</h2>
+    <p class="section-sub">
+      A production-grade cheminformatics and AI stack that runs
+      entirely on your own hardware — no external AI APIs, no data
+      leaving your network.
+    </p>
 
-  <div class="code-section reveal">
-    <!-- Tab bar -->
-    <div class="code-tabs" role="tablist" aria-label="Quick start steps">
-      <button class="code-tab active" role="tab"
-              aria-selected="true" aria-controls="tab-install"
-              onclick="switchTab(event,'install')">
-        📦 Install
-      </button>
-      <button class="code-tab" role="tab"
-              aria-selected="false" aria-controls="tab-run"
-              onclick="switchTab(event,'run')">
-        ▶️ Run
-      </button>
-      <button class="code-tab" role="tab"
-              aria-selected="false" aria-controls="tab-ollama"
-              onclick="switchTab(event,'ollama')">
-        🦙 Ollama Setup
-      </button>
-      <button class="code-tab" role="tab"
-              aria-selected="false" aria-controls="tab-docker"
-              onclick="switchTab(event,'docker')">
-        🐳 Docker
-      </button>
+    <div class="bento reveal-stagger">
+
+      <!-- Wide card: Ollama routing with flow diagram -->
+      <div class="bento-card bento-wide"
+           style="--card-accent:linear-gradient(90deg,var(--green),var(--cyan))">
+        <span class="bento-icon">🤖</span>
+        <h3>Smart Ollama Routing with Automatic Failover</h3>
+        <p>Health-checks your remote GPU server first.
+           Falls back to local Ollama within 5 seconds — completely
+           transparent to the pipeline. Configurable timeout.</p>
+
+        <div class="mini-flow">
+          <div class="mini-flow-row">
+            <div class="mini-badge mb-green">1</div>
+            Remote Ollama &nbsp;<code class="code-def">OLLAMA_REMOTE_URL</code>
+            &nbsp;← tried first
+          </div>
+          <div class="mini-flow-connector">│ &nbsp;timeout / refused (5 s) → ▼</div>
+          <div class="mini-flow-row">
+            <div class="mini-badge mb-yellow">2</div>
+            Local Ollama &nbsp;<code class="code-def">localhost:11434</code>
+            &nbsp;← automatic fallback
+          </div>
+          <div class="mini-flow-connector">│ &nbsp;also unreachable → ▼</div>
+          <div class="mini-flow-row">
+            <div class="mini-badge mb-red">✕</div>
+            <code class="code-var">RuntimeError</code>
+            — pipeline aborted
+          </div>
+        </div>
+      </div>
+
+      <!-- Tall card: Token budget bars -->
+      <div class="bento-card bento-tall"
+           style="--card-accent:linear-gradient(90deg,var(--blue),var(--purple))">
+        <span class="bento-icon">📐</span>
+        <h3>Token Budget Management</h3>
+        <p>Strict 8K-token prompt budget. HuggingFace tokenizer primary,
+           tiktoken fallback. Auto-chunks large literature into 50-abstract
+           batches, compresses to ~500-token summaries.</p>
+
+        <div class="token-bars" id="token-bars">
+          <div class="t-bar-row">
+            <div class="t-bar-label">
+              <span>Prompt budget</span><span>8,000 tokens</span>
+            </div>
+            <div class="t-bar-track">
+              <div class="t-bar-fill fill-green" data-w="25"></div>
+            </div>
+          </div>
+          <div class="t-bar-row">
+            <div class="t-bar-label">
+              <span>Model reasoning</span><span>24,000 tokens</span>
+            </div>
+            <div class="t-bar-track">
+              <div class="t-bar-fill fill-blue" data-w="75"></div>
+            </div>
+          </div>
+          <div class="t-bar-row">
+            <div class="t-bar-label">
+              <span>Safety margin</span><span>500 tokens</span>
+            </div>
+            <div class="t-bar-track">
+              <div class="t-bar-fill fill-amber" data-w="2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:1.4rem; display:grid; gap:.5rem;">
+          <div style="display:flex; gap:.5rem; font-size:.78rem;">
+            <span style="background:rgba(0,208,132,.1);border:1px solid rgba(0,208,132,.2);
+                         border-radius:4px;padding:.15rem .5rem;color:var(--green)">
+              &lt; 7,500 tokens
+            </span>
+            <span style="color:var(--text-2)">Pass directly</span>
+          </div>
+          <div style="display:flex; gap:.5rem; font-size:.78rem;">
+            <span style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);
+                         border-radius:4px;padding:.15rem .5rem;color:var(--blue)">
+              7,500 – 8,000
+            </span>
+            <span style="color:var(--text-2)">Trim least-critical fields</span>
+          </div>
+          <div style="display:flex; gap:.5rem; font-size:.78rem;">
+            <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);
+                         border-radius:4px;padding:.15rem .5rem;color:var(--amber)">
+              &gt; 8,000 tokens
+            </span>
+            <span style="color:var(--text-2)">Summarise + compress</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strict JSON -->
+      <div class="bento-card"
+           style="--card-accent:linear-gradient(90deg,var(--purple),var(--blue))">
+        <span class="bento-icon">✅</span>
+        <h3>Strict JSON Validation</h3>
+        <p>All inter-agent messages validated against Pydantic v2 schemas.
+           Up to 3 automatic retries with progressively stricter prompts
+           on any parse failure.</p>
+      </div>
+
+      <!-- RDKit -->
+      <div class="bento-card"
+           style="--card-accent:linear-gradient(90deg,var(--cyan),var(--green))">
+        <span class="bento-icon">🧬</span>
+        <h3>Real Cheminformatics</h3>
+        <p>RDKit-powered molecule generation, Lipinski filtering, QED
+           scoring, SA scoring, and optional synthesis route evaluation.
+           Not toy examples.</p>
+      </div>
+
+      <!-- APIs -->
+      <div class="bento-card"
+           style="--card-accent:linear-gradient(90deg,var(--amber),#f97316)">
+        <span class="bento-icon">🔌</span>
+        <h3>Six External API Integrations</h3>
+        <p>PubMed ESearch/EFetch, arXiv, PatentsView, UniProt REST,
+           RCSB PDB, and AutoDock Vina — all wired up and production-ready.</p>
+      </div>
+
+      <!-- Docker -->
+      <div class="bento-card"
+           style="--card-accent:linear-gradient(90deg,#2496ed,var(--cyan))">
+        <span class="bento-icon">🐳</span>
+        <h3>Docker Support</h3>
+        <p>Dockerfile and docker-compose included for fully reproducible,
+           isolated deployment on any machine or CI environment.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="hr" />
+
+  <!-- ══════════════════════════════════════════════
+       QUICK START TERMINAL
+  ══════════════════════════════════════════════ -->
+  <div class="section" id="quickstart">
+    <div class="section-label">Quick Start</div>
+    <h2 class="section-title">Up and Running in Minutes</h2>
+    <p class="section-sub">
+      Clone, point to your Ollama endpoint, and fire.
+      The pipeline handles everything else automatically.
+    </p>
+
+    <div class="terminal reveal">
+      <!-- Mac-style title bar -->
+      <div class="term-bar">
+        <div class="term-dots" aria-hidden="true">
+          <div class="term-dot td-red"></div>
+          <div class="term-dot td-yellow"></div>
+          <div class="term-dot td-green"></div>
+        </div>
+        <div class="term-title">drug-discovery-pipeline — bash</div>
+        <button class="term-copy" id="main-copy"
+                onclick="copyTerminal(this)" aria-label="Copy code">
+          📋 Copy
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="term-tabs" role="tablist">
+        <button class="term-tab active" role="tab"
+                aria-selected="true"  aria-controls="tp-install"
+                onclick="switchTerm(event,'install')">
+          📦 Install
+        </button>
+        <button class="term-tab" role="tab"
+                aria-selected="false" aria-controls="tp-run"
+                onclick="switchTerm(event,'run')">
+          ▶️ Run
+        </button>
+        <button class="term-tab" role="tab"
+                aria-selected="false" aria-controls="tp-ollama"
+                onclick="switchTerm(event,'ollama')">
+          🦙 Ollama
+        </button>
+        <button class="term-tab" role="tab"
+                aria-selected="false" aria-controls="tp-docker"
+                onclick="switchTerm(event,'docker')">
+          🐳 Docker
+        </button>
+        <button class="term-tab" role="tab"
+                aria-selected="false" aria-controls="tp-debug"
+                onclick="switchTerm(event,'debug')">
+          🐛 Debug
+        </button>
+      </div>
+
+      <!-- Install panel -->
+      <div class="term-body">
+
+        <div id="tp-install" class="term-panel active">
+<pre><span class="t-comment"># ── Clone and set up ────────────────────────────────────────</span>
+<span class="t-prompt">$ </span><span class="t-cmd">git clone</span> <span class="t-str">https://github.com/2am-dev/Drug-Discovery-Pipeline-V2.git</span>
+<span class="t-prompt">$ </span><span class="t-cmd">cd</span> Drug-Discovery-Pipeline-V2
+
+<span class="t-comment"># Create isolated virtual environment</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python -m venv</span> .venv
+<span class="t-prompt">$ </span><span class="t-cmd">source</span> .venv/bin/activate    <span class="t-comment"># Windows: .venv\Scripts\activate</span>
+
+<span class="t-comment"># Install all dependencies</span>
+<span class="t-prompt">$ </span><span class="t-cmd">pip install -r</span> requirements.txt
+
+<span class="t-comment"># Configure environment</span>
+<span class="t-prompt">$ </span><span class="t-cmd">cp</span> .env.example .env
+<span class="t-comment"># → Edit .env: set OLLAMA_REMOTE_URL to your server IP</span>
+<span class="cursor"></span></pre>
+        </div>
+
+        <div id="tp-run" class="term-panel">
+<pre><span class="t-comment"># ── Run examples ────────────────────────────────────────────</span>
+
+<span class="t-comment"># Basic — disease indication</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python main.py</span> <span class="t-flag">--indication</span> <span class="t-str">"non-small cell lung cancer"</span>
+
+<span class="t-comment"># Specific biological target with model override</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python main.py</span> <span class="t-flag">--target</span> EGFR <span class="t-flag">--model</span> gemma2:27b
+
+<span class="t-comment"># Full run — synthesis evaluation included</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python main.py</span> <span class="t-flag">--indication</span> <span class="t-str">"Alzheimer's disease"</span> <span class="t-flag">--enable-synthesis</span>
+
+<span class="t-comment"># Local Ollama only (skip remote server entirely)</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python main.py</span> <span class="t-flag">--indication</span> <span class="t-str">"KRAS-driven pancreatic cancer"</span> <span class="t-flag">--local-only</span>
+
+<span class="t-comment"># Fast debug — skip docking and patent search</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python main.py</span> <span class="t-flag">--indication</span> <span class="t-str">"Type 2 diabetes"</span> <span class="t-flag">--no-docking --no-patents</span>
+<span class="cursor"></span></pre>
+        </div>
+
+        <div id="tp-ollama" class="term-panel">
+<pre><span class="t-comment"># ── Remote GPU server setup ──────────────────────────────────</span>
+<span class="t-prompt">$ </span><span class="t-cmd">curl -fsSL</span> https://ollama.ai/install.sh | sh
+
+<span class="t-comment"># Pull required models</span>
+<span class="t-prompt">$ </span><span class="t-cmd">ollama pull</span> gemma4:31b-it-q8_0       <span class="t-comment"># Primary LLM  (~20 GB)</span>
+<span class="t-prompt">$ </span><span class="t-cmd">ollama pull</span> gemma4:26b-a4b-it-q8_0   <span class="t-comment"># Alternative  (~16 GB)</span>
+<span class="t-prompt">$ </span><span class="t-cmd">ollama pull</span> nomic-embed-text          <span class="t-comment"># Embeddings   (~274 MB)</span>
+
+<span class="t-comment"># Start server with network access (trusted network / VPN only)</span>
+<span class="t-prompt">$ </span><span class="t-key">OLLAMA_HOST</span>=<span class="t-val">0.0.0.0:11434</span> <span class="t-cmd">ollama serve</span>
+
+<span class="t-comment"># Set in .env on your client machine</span>
+<span class="t-key">OLLAMA_REMOTE_URL</span>=<span class="t-val">http://192.168.1.100:11434/v1</span>
+
+<span class="t-comment"># ── Local fallback (no remote server needed) ─────────────────</span>
+<span class="t-prompt">$ </span><span class="t-cmd">ollama serve</span>    <span class="t-comment"># Listens on localhost:11434 by default</span>
+<span class="cursor"></span></pre>
+        </div>
+
+        <div id="tp-docker" class="term-panel">
+<pre><span class="t-comment"># ── Docker deployment ────────────────────────────────────────</span>
+
+<span class="t-comment"># Build and start all services</span>
+<span class="t-prompt">$ </span><span class="t-cmd">docker compose up</span> --build
+
+<span class="t-comment"># Run a single pipeline job inside the container</span>
+<span class="t-prompt">$ </span><span class="t-cmd">docker compose run</span> pipeline \
+    <span class="t-flag">--indication</span> <span class="t-str">"non-small cell lung cancer"</span> \
+    <span class="t-flag">--enable-synthesis</span>
+
+<span class="t-comment"># Stop and remove all containers</span>
+<span class="t-prompt">$ </span><span class="t-cmd">docker compose down</span>
+
+<span class="t-comment"># Rebuild image without cache (after dependency changes)</span>
+<span class="t-prompt">$ </span><span class="t-cmd">docker compose build</span> --no-cache
+<span class="cursor"></span></pre>
+        </div>
+
+        <div id="tp-debug" class="term-panel">
+<pre><span class="t-comment"># ── Debugging and diagnostics ────────────────────────────────</span>
+
+<span class="t-comment"># Verbose debug output — raw LLM responses logged</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python main.py</span> <span class="t-flag">--indication</span> <span class="t-str">"NSCLC"</span> <span class="t-flag">--log-level</span> DEBUG
+
+<span class="t-comment"># Pre-flight Ollama connectivity check</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python scripts/check_ollama.py</span>
+
+<span class="t-comment"># Check remote and local endpoints manually</span>
+<span class="t-prompt">$ </span><span class="t-cmd">curl</span> http://your-remote:11434/api/tags
+<span class="t-prompt">$ </span><span class="t-cmd">curl</span> http://localhost:11434/api/tags
+
+<span class="t-comment"># Reset ChromaDB vector store</span>
+<span class="t-prompt">$ </span><span class="t-cmd">python scripts/clear_vectorstore.py</span>
+
+<span class="t-comment"># Lower JSON temperature if getting parse errors</span>
+<span class="t-key">LLM_JSON_TEMPERATURE</span>=<span class="t-val">0.1</span> <span class="t-cmd">python main.py</span> <span class="t-flag">--indication</span> <span class="t-str">"NSCLC"</span>
+<span class="cursor"></span></pre>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <hr class="hr" />
+
+  <!-- ══════════════════════════════════════════════
+       JSON OUTPUT SHOWCASE
+  ══════════════════════════════════════════════ -->
+  <div class="section" id="outputs">
+    <div class="section-label">Schema Examples</div>
+    <h2 class="section-title">Validated JSON at Every Stage</h2>
+    <p class="section-sub">
+      Every agent produces structured, Pydantic-validated output.
+      Here are real examples from the pipeline.
+    </p>
+
+    <div class="json-grid reveal-stagger">
+
+      <div class="json-card">
+        <div class="json-card-header">
+          <div class="json-dot" style="background:var(--green)"></div>
+          Hypothesis Agent Output
+        </div>
+        <pre><span class="j-punct">{</span>
+  <span class="j-key">"selected_target"</span><span class="j-punct">: {</span>
+    <span class="j-key">"gene_name"</span><span class="j-punct">:</span> <span class="j-str">"EGFR"</span><span class="j-punct">,</span>
+    <span class="j-key">"uniprot_id"</span><span class="j-punct">:</span> <span class="j-str">"P00533"</span><span class="j-punct">,</span>
+    <span class="j-key">"pdb_id"</span><span class="j-punct">:</span> <span class="j-str">"1M17"</span><span class="j-punct">,</span>
+    <span class="j-key">"binding_site_residues"</span><span class="j-punct">: [</span>
+      <span class="j-str">"L718"</span><span class="j-punct">,</span> <span class="j-str">"V726"</span><span class="j-punct">,</span>
+      <span class="j-str">"A743"</span><span class="j-punct">,</span> <span class="j-str">"M793"</span>
+    <span class="j-punct">]</span>
+  <span class="j-punct">},</span>
+  <span class="j-key">"hypothesis"</span><span class="j-punct">: {</span>
+    <span class="j-key">"mechanism"</span><span class="j-punct">:</span> <span class="j-str">"Selective inhibition
+    of EGFR ATP-binding site..."</span><span class="j-punct">,</span>
+    <span class="j-key">"confidence_score"</span><span class="j-punct">:</span> <span class="j-num">0.87</span>
+  <span class="j-punct">}</span>
+<span class="j-punct">}</span></pre>
+      </div>
+
+      <div class="json-card">
+        <div class="json-card-header">
+          <div class="json-dot" style="background:var(--blue)"></div>
+          Molecule Designer Output
+        </div>
+        <pre><span class="j-punct">{</span>
+  <span class="j-key">"generated_molecules"</span><span class="j-punct">: [{</span>
+    <span class="j-key">"smiles"</span><span class="j-punct">:</span> <span class="j-str">"CCN(CC)CCNC(=O)c1..."</span><span class="j-punct">,</span>
+    <span class="j-key">"molecular_weight"</span><span class="j-punct">:</span> <span class="j-num">445.9</span><span class="j-punct">,</span>
+    <span class="j-key">"logP"</span><span class="j-punct">:</span> <span class="j-num">4.2</span><span class="j-punct">,</span>
+    <span class="j-key">"qed_score"</span><span class="j-punct">:</span> <span class="j-num">0.72</span><span class="j-punct">,</span>
+    <span class="j-key">"sa_score"</span><span class="j-punct">:</span> <span class="j-num">2.8</span><span class="j-punct">,</span>
+    <span class="j-key">"lipinski_violations"</span><span class="j-punct">:</span> <span class="j-num">0</span>
+  <span class="j-punct">}],</span>
+  <span class="j-key">"shortlisted_count"</span><span class="j-punct">:</span> <span class="j-num">5</span><span class="j-punct">,</span>
+  <span class="j-key">"filtering_criteria"</span><span class="j-punct">: {</span>
+    <span class="j-key">"max_mw"</span><span class="j-punct">:</span> <span class="j-num">500</span><span class="j-punct">,</span>
+    <span class="j-key">"min_qed"</span><span class="j-punct">:</span> <span class="j-num">0.5</span><span class="j-punct">,</span>
+    <span class="j-key">"max_sa"</span><span class="j-punct">:</span> <span class="j-num">4.0</span>
+  <span class="j-punct">}</span>
+<span class="j-punct">}</span></pre>
+      </div>
+
+      <div class="json-card">
+        <div class="json-card-header">
+          <div class="json-dot" style="background:var(--purple)"></div>
+          Docking Evaluator Output
+        </div>
+        <pre><span class="j-punct">{</span>
+  <span class="j-key">"docking_results"</span><span class="j-punct">: [{</span>
+    <span class="j-key">"smiles"</span><span class="j-punct">:</span> <span class="j-str">"CCN(CC)CCNC(=O)..."</span><span class="j-punct">,</span>
+    <span class="j-key">"binding_affinity_kcal_mol"</span><span class="j-punct">:</span>
+      <span class="j-num">-8.4</span><span class="j-punct">,</span>
+    <span class="j-key">"ligand_efficiency"</span><span class="j-punct">:</span> <span class="j-num">0.35</span><span class="j-punct">,</span>
+    <span class="j-key">"key_interactions"</span><span class="j-punct">: [</span>
+      <span class="j-str">"H-bond with Met793"</span><span class="j-punct">,</span>
+      <span class="j-str">"Pi-stack with Phe723"</span>
+    <span class="j-punct">]</span>
+  <span class="j-punct">}],</span>
+  <span class="j-key">"receptor_pdb"</span><span class="j-punct">:</span> <span class="j-str">"1M17"</span><span class="j-punct">,</span>
+  <span class="j-key">"docking_software"</span><span class="j-punct">:</span>
+    <span class="j-str">"AutoDock Vina 1.2.3"</span>
+<span class="j-punct">}</span></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="hr" />
+
+  <!-- ══════════════════════════════════════════════
+       CONFIG TABLE
+  ══════════════════════════════════════════════ -->
+  <div class="section" id="config">
+    <div class="section-label">Configuration</div>
+    <h2 class="section-title">Environment Variables</h2>
+    <p class="section-sub">
+      All settings controlled via <code class="code-def">.env</code> or
+      exported shell variables. Copy <code class="code-def">.env.example</code>
+      to get started.
+    </p>
+
+    <div class="config-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="code-var">OLLAMA_REMOTE_URL</code></td>
+            <td><code class="code-def">http://remote:11434/v1</code></td>
+            <td style="color:var(--text-2)">Remote Ollama endpoint — tried first</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">OLLAMA_LOCAL_URL</code></td>
+            <td><code class="code-def">http://localhost:11434/v1</code></td>
+            <td style="color:var(--text-2)">Local Ollama fallback endpoint</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">OLLAMA_HEALTH_TIMEOUT</code></td>
+            <td><code class="code-def">5</code></td>
+            <td style="color:var(--text-2)">Health-check timeout in seconds</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">LLM_MODEL</code></td>
+            <td><code class="code-def">gemma4:31b-it-q8_0</code></td>
+            <td style="color:var(--text-2)">Primary LLM model identifier</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">LLM_JSON_TEMPERATURE</code></td>
+            <td><code class="code-def">0.2</code></td>
+            <td style="color:var(--text-2)">Temperature for JSON-strict calls</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">MAX_CONTEXT_TOKENS</code></td>
+            <td><code class="code-def">8000</code></td>
+            <td style="color:var(--text-2)">Max tokens per LLM prompt</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">PUBMED_MAX_RESULTS</code></td>
+            <td><code class="code-def">150</code></td>
+            <td style="color:var(--text-2)">Max PubMed abstracts per run</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">MOL_GENERATION_COUNT</code></td>
+            <td><code class="code-def">20</code></td>
+            <td style="color:var(--text-2)">Molecules generated before filtering</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">MOL_SHORTLIST_COUNT</code></td>
+            <td><code class="code-def">5</code></td>
+            <td style="color:var(--text-2)">Top molecules passed to docking</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">VINA_EXHAUSTIVENESS</code></td>
+            <td><code class="code-def">8</code></td>
+            <td style="color:var(--text-2)">AutoDock Vina search depth</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">ENABLE_CHEMICAL_SYNTHESIS</code></td>
+            <td><code class="code-note">false</code></td>
+            <td style="color:var(--text-2)">Enable synthesis route evaluation phase</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">ENABLE_PDF_REPORT</code></td>
+            <td><code class="code-note">false</code></td>
+            <td style="color:var(--text-2)">Generate PDF alongside Markdown report</td>
+          </tr>
+          <tr>
+            <td><code class="code-var">ENABLE_LLM_CACHE</code></td>
+            <td><code class="code-note">false</code></td>
+            <td style="color:var(--text-2)">Cache LLM responses to disk</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-logo">
+      <div class="nav-logo-icon" aria-hidden="true"
+           style="width:30px;height:30px;font-size:.85rem;">⚗️</div>
+      Drug Discovery Pipeline
+      <span style="color:var(--text-3); font-weight:500;">V2</span>
     </div>
 
-    <!-- Install -->
-    <div id="tab-install" class="tab-panel active" role="tabpanel">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn"
-                onclick="copyCode(this)"
-                data-code="git clone https://github.com/2am-dev/Drug-Discovery-Pipeline-V2.git
+    <div class="footer-links">
+      <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
+         target="_blank" rel="noopener noreferrer">GitHub</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2/blob/main/README.md"
+         target="_blank" rel="noopener noreferrer">Documentation</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2/blob/main/LICENSE"
+         target="_blank" rel="noopener noreferrer">MIT License</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/2am-dev"
+         target="_blank" rel="noopener noreferrer">@2am-dev</a>
+    </div>
+
+    <div class="footer-stack">
+      <a class="stack-pill" href="https://ollama.ai"
+         target="_blank" rel="noopener noreferrer">🦙 Ollama</a>
+      <a class="stack-pill" href="https://ai.google.dev/gemma"
+         target="_blank" rel="noopener noreferrer">💎 Gemma 4</a>
+      <a class="stack-pill" href="https://www.rdkit.org"
+         target="_blank" rel="noopener noreferrer">🧪 RDKit</a>
+      <a class="stack-pill" href="https://www.trychroma.com"
+         target="_blank" rel="noopener noreferrer">🗄️ ChromaDB</a>
+      <a class="stack-pill" href="https://docs.pydantic.dev"
+         target="_blank" rel="noopener noreferrer">✅ Pydantic v2</a>
+      <a class="stack-pill" href="https://autodock-vina.readthedocs.io"
+         target="_blank" rel="noopener noreferrer">🔬 AutoDock Vina</a>
+    </div>
+
+    <p class="footer-copy">
+      Built with ❤️ by
+      <a href="https://github.com/2am-dev"
+         target="_blank" rel="noopener noreferrer">@2am-dev</a>
+      · Open source under MIT
+    </p>
+  </footer>
+
+</div><!-- /.page -->
+
+<!-- Back to top -->
+<button id="btt" aria-label="Back to top" onclick="scrollTop()">↑</button>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+/* ── Particle / molecule canvas ──────────────────── */
+(function () {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, nodes, edges, raf;
+
+  const COLORS = ['#00d084','#3b82f6','#a855f7','#22d3ee','#f59e0b'];
+  const N = 55;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function init() {
+    resize();
+    nodes = Array.from({ length: N }, () => ({
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      vx: (Math.random() - .5) * .35,
+      vy: (Math.random() - .5) * .35,
+      r:  Math.random() * 2.2 + 1,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      alpha: Math.random() * .5 + .25,
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    /* edges */
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const d  = Math.sqrt(dx*dx + dy*dy);
+        if (d < 160) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(255,255,255,${.04 * (1 - d / 160)})`;
+          ctx.lineWidth = .8;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* nodes */
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = n.color;
+      ctx.globalAlpha = n.alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+    });
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => {
+    resize();
+    cancelAnimationFrame(raf);
+    draw();
+  });
+
+  init();
+  draw();
+})();
+
+/* ── Nav scroll state ────────────────────────────── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 30);
+  document.getElementById('btt')
+          .classList.toggle('show', window.scrollY > 500);
+}, { passive: true });
+
+/* ── Scroll reveal ───────────────────────────────── */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: .1 });
+
+document.querySelectorAll('.reveal, .reveal-stagger')
+        .forEach(el => revealObs.observe(el));
+
+/* ── Animated counters ───────────────────────────── */
+function animateCount(el, target, duration) {
+  const start = performance.now();
+  (function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target);
+    if (t < 1) requestAnimationFrame(step);
+  })(start);
+}
+
+const countObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-count]').forEach(el => {
+        animateCount(el, +el.dataset.count, 1400);
+      });
+      countObs.unobserve(e.target);
+    }
+  });
+}, { threshold: .3 });
+
+document.querySelectorAll('.stats-row').forEach(el => countObs.observe(el));
+
+/* ── Token bar animation ─────────────────────────── */
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.t-bar-fill[data-w]').forEach(fill => {
+        fill.style.width = fill.dataset.w + '%';
+      });
+      barObs.unobserve(e.target);
+    }
+  });
+}, { threshold: .25 });
+
+const tbWrap = document.getElementById('token-bars');
+if (tbWrap) barObs.observe(tbWrap.closest('.bento-card'));
+
+/* ── Terminal tab switching ──────────────────────── */
+const termCopyCodes = {
+  install: `git clone https://github.com/2am-dev/Drug-Discovery-Pipeline-V2.git
 cd Drug-Discovery-Pipeline-V2
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env">
-          📋 Copy
-        </button>
-      </div>
-      <div class="code-body">
-        <pre><span class="c-comment"># Clone the repository</span>
-<span class="c-cmd">git clone</span> <span class="c-string">https://github.com/2am-dev/Drug-Discovery-Pipeline-V2.git</span>
-<span class="c-cmd">cd</span> Drug-Discovery-Pipeline-V2
-
-<span class="c-comment"># Create and activate virtual environment</span>
-<span class="c-cmd">python -m venv</span> .venv
-<span class="c-cmd">source</span> .venv/bin/activate   <span class="c-comment"># Windows: .venv\Scripts\activate</span>
-
-<span class="c-comment"># Install dependencies</span>
-<span class="c-cmd">pip install -r</span> requirements.txt
-
-<span class="c-comment"># Copy and edit environment config</span>
-<span class="c-cmd">cp</span> .env.example .env
-<span class="c-comment"># → Edit .env and set OLLAMA_REMOTE_URL to your server</span></pre>
-      </div>
-    </div>
-
-    <!-- Run -->
-    <div id="tab-run" class="tab-panel" role="tabpanel">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)"
-                data-code='python main.py --indication "non-small cell lung cancer"'>
-          📋 Copy
-        </button>
-      </div>
-      <div class="code-body">
-        <pre><span class="c-comment"># Basic run — disease indication</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"non-small cell lung cancer"</span>
-
-<span class="c-comment"># Specific biological target with alternative model</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--target</span> EGFR <span class="c-flag">--model</span> gemma2:27b
-
-<span class="c-comment"># Full run with synthesis evaluation</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"Alzheimer's disease"</span> <span class="c-flag">--enable-synthesis</span>
-
-<span class="c-comment"># Local Ollama only — skip remote server</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"KRAS-driven pancreatic cancer"</span> <span class="c-flag">--local-only</span>
-
-<span class="c-comment"># Fast debug run — skip docking and patents</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"Type 2 diabetes"</span> <span class="c-flag">--no-docking --no-patents</span>
-
-<span class="c-comment"># Verbose debug output</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"NSCLC"</span> <span class="c-flag">--log-level</span> DEBUG</pre>
-      </div>
-    </div>
-
-    <!-- Ollama -->
-    <div id="tab-ollama" class="tab-panel" role="tabpanel">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)"
-                data-code="curl -fsSL https://ollama.ai/install.sh | sh
+cp .env.example .env`,
+  run: `python main.py --indication "non-small cell lung cancer"
+python main.py --target EGFR --model gemma2:27b
+python main.py --indication "Alzheimer's disease" --enable-synthesis
+python main.py --indication "KRAS-driven pancreatic cancer" --local-only
+python main.py --indication "Type 2 diabetes" --no-docking --no-patents`,
+  ollama: `curl -fsSL https://ollama.ai/install.sh | sh
 ollama pull gemma4:31b-it-q8_0
+ollama pull gemma4:26b-a4b-it-q8_0
 ollama pull nomic-embed-text
-OLLAMA_HOST=0.0.0.0:11434 ollama serve">
-          📋 Copy
-        </button>
-      </div>
-      <div class="code-body">
-        <pre><span class="c-comment"># ── Remote GPU server setup ───────────────────────</span>
-<span class="c-cmd">curl -fsSL</span> https://ollama.ai/install.sh | sh
+OLLAMA_HOST=0.0.0.0:11434 ollama serve`,
+  docker: `docker compose up --build
+docker compose run pipeline --indication "non-small cell lung cancer" --enable-synthesis
+docker compose down`,
+  debug: `python main.py --indication "NSCLC" --log-level DEBUG
+python scripts/check_ollama.py
+python scripts/clear_vectorstore.py`,
+};
 
-<span class="c-comment"># Pull required models</span>
-<span class="c-cmd">ollama pull</span> gemma4:31b-it-q8_0       <span class="c-comment"># Primary LLM  (~20 GB)</span>
-<span class="c-cmd">ollama pull</span> gemma4:26b-a4b-it-q8_0   <span class="c-comment"># Alternative  (~16 GB)</span>
-<span class="c-cmd">ollama pull</span> nomic-embed-text          <span class="c-comment"># Embeddings   (~274 MB)</span>
+let currentTermTab = 'install';
 
-<span class="c-comment"># Expose on network (trusted network / VPN only)</span>
-<span class="c-key">OLLAMA_HOST</span>=<span class="c-val">0.0.0.0:11434</span> <span class="c-cmd">ollama serve</span>
+function switchTerm(evt, id) {
+  document.querySelectorAll('.term-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  document.querySelectorAll('.term-panel').forEach(p =>
+    p.classList.remove('active'));
 
-<span class="c-comment"># ── .env configuration ───────────────────────────</span>
-<span class="c-key">OLLAMA_REMOTE_URL</span>=<span class="c-val">http://192.168.1.100:11434/v1</span>
+  evt.currentTarget.classList.add('active');
+  evt.currentTarget.setAttribute('aria-selected', 'true');
+  document.getElementById('tp-' + id).classList.add('active');
+  currentTermTab = id;
 
-<span class="c-comment"># ── Local fallback (RTX 5070 Ti) ─────────────────</span>
-<span class="c-cmd">ollama serve</span>   <span class="c-comment"># Listens on localhost:11434 by default</span></pre>
-      </div>
-    </div>
+  const copyBtn = document.getElementById('main-copy');
+  copyBtn.textContent = '📋 Copy';
+  copyBtn.classList.remove('copied');
+}
 
-    <!-- Docker -->
-    <div id="tab-docker" class="tab-panel" role="tabpanel">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)"
-                data-code="docker compose up --build">
-          📋 Copy
-        </button>
-      </div>
-      <div class="code-body">
-        <pre><span class="c-comment"># Build and start all services</span>
-<span class="c-cmd">docker compose up</span> --build
+function copyTerminal(btn) {
+  const code = termCopyCodes[currentTermTab] || '';
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copy';
+      btn.classList.remove('copied');
+    }, 2200);
+  }).catch(() => {
+    btn.textContent = '❌ Failed';
+    setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+  });
+}
 
-<span class="c-comment"># Run a single pipeline job inside the container</span>
-<span class="c-cmd">docker compose run</span> pipeline \
-  <span class="c-flag">--indication</span> <span class="c-string">"non-small cell lung cancer"</span>
+/* ── Bento card mouse glow ───────────────────────── */
+document.querySelectorAll('.bento-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mouse-x', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--mouse-y', (e.clientY - r.top)  + 'px');
+  });
+});
 
-<span class="c-comment"># Stop and remove containers</span>
-<span class="c-cmd">docker compose down</span></pre>
-      </div>
-    </div>
-
-  </div><!-- /.code-section -->
-</section>
-
-<hr class="divider" />
-
-<!-- ── Connectivity Flow ─────────────────────────── -->
-<section id="routing" aria-labelledby="routing-heading">
-  <div class="section-label" aria-hidden="true">Connectivity</div>
-  <h2 id="routing-heading" class="section-title">Automatic Failover</h2>
-  <p class="section-sub">
-    The pipeline health-checks your remote server first and silently
-    falls back to local Ollama if unavailable — configurable timeout.
-  </p>
-
-  <div class="flow-box reveal">
-    <div class="flow-row">
-      <span class="badge badge-blue">1</span>
-      Remote Ollama &nbsp;<code>OLLAMA_REMOTE_URL</code>&nbsp;
-      — tried first
-    </div>
-    <div class="flow-connector">
-      │ &nbsp;timeout or connection refused (default 5 s)<br/>▼
-    </div>
-
-    <div class="flow-row">
-      <span class="badge badge-yellow">2</span>
-      Local Ollama &nbsp;<code>localhost:11434</code>&nbsp;
-      — automatic fallback
-    </div>
-    <div class="flow-connector">
-      │ &nbsp;also unreachable<br/>▼
-    </div>
-
-    <div class="flow-row">
-      <span class="badge badge-red">✕</span>
-      <code>RuntimeError: No Ollama endpoint available</code>
-      — pipeline aborted
-    </div>
-  </div>
-</section>
-
-<hr class="divider" />
-
-<!-- ── Token Budget ──────────────────────────────── -->
-<section id="tokens" aria-labelledby="token-heading">
-  <div class="section-label" aria-hidden="true">Performance</div>
-  <h2 id="token-heading" class="section-title">Token Budget</h2>
-  <p class="section-sub">
-    Operates within a strict 8,000-token prompt budget, leaving ~24,000
-    tokens of headroom for model reasoning inside Gemma4's 32K window.
-  </p>
-
-  <div class="budget-bar-wrap reveal">
-    <p style="font-size:.875rem; color:var(--text-muted); margin-bottom:.5rem;">
-      32,000 token context window breakdown
-    </p>
-
-    <div style="margin: 1rem 0;">
-      <div style="font-size:.82rem; color:var(--text-muted);
-                  margin-bottom:.4rem; display:flex;
-                  justify-content:space-between;">
-        <span>Prompt budget</span><span>8,000 tokens (25%)</span>
-      </div>
-      <div class="budget-bar">
-        <div class="budget-fill" style="width:0%" id="bar-prompt"
-             role="progressbar" aria-valuenow="25"
-             aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-    </div>
-
-    <div style="margin: 1rem 0;">
-      <div style="font-size:.82rem; color:var(--text-muted);
-                  margin-bottom:.4rem; display:flex;
-                  justify-content:space-between;">
-        <span>Model reasoning headroom</span><span>24,000 tokens (75%)</span>
-      </div>
-      <div class="budget-bar">
-        <div class="budget-fill"
-             style="width:0%; background:linear-gradient(90deg,#1f6feb,#58a6ff);"
-             id="bar-model" role="progressbar" aria-valuenow="75"
-             aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-                gap:.75rem; margin-top:1.5rem; font-size:.82rem;">
-      <div style="background:var(--surface2); border:1px solid var(--border);
-                  border-radius:var(--radius-sm); padding:.75rem;">
-        <div style="color:var(--text-muted); margin-bottom:.2rem;">
-          Input &lt; 7,500 tokens
-        </div>
-        <div style="font-weight:600;">Pass directly to LLM</div>
-      </div>
-      <div style="background:var(--surface2); border:1px solid var(--border);
-                  border-radius:var(--radius-sm); padding:.75rem;">
-        <div style="color:var(--text-muted); margin-bottom:.2rem;">
-          7,500 – 8,000 tokens
-        </div>
-        <div style="font-weight:600;">Trim least-critical fields</div>
-      </div>
-      <div style="background:var(--surface2); border:1px solid var(--border);
-                  border-radius:var(--radius-sm); padding:.75rem;">
-        <div style="color:var(--text-muted); margin-bottom:.2rem;">
-          &gt; 8,000 tokens
-        </div>
-        <div style="font-weight:600;">Summarise + compress</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider" />
-
-<!-- ── Configuration ────────────────────────────────── -->
-<section id="config" aria-labelledby="config-heading">
-  <div class="section-label" aria-hidden="true">Configuration</div>
-  <h2 id="config-heading" class="section-title">Environment Variables</h2>
-  <p class="section-sub">
-    All settings controlled via <code>.env</code> or exported shell
-    variables. Copy <code>.env.example</code> to get started.
-  </p>
-
-  <div class="table-wrap reveal">
-    <table>
-      <thead>
-        <tr>
-          <th>Variable</th>
-          <th>Default</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>OLLAMA_REMOTE_URL</code></td>
-          <td><code>http://remote:11434/v1</code></td>
-          <td>Remote Ollama endpoint (tried first)</td>
-        </tr>
-        <tr>
-          <td><code>OLLAMA_LOCAL_URL</code></td>
-          <td><code>http://localhost:11434/v1</code></td>
-          <td>Local Ollama fallback endpoint</td>
-        </tr>
-        <tr>
-          <td><code>OLLAMA_HEALTH_TIMEOUT</code></td>
-          <td><code>5</code></td>
-          <td>Health-check timeout in seconds</td>
-        </tr>
-        <tr>
-          <td><code>LLM_MODEL</code></td>
-          <td><code>gemma4:31b-it-q8_0</code></td>
-          <td>Primary LLM model identifier</td>
-        </tr>
-        <tr>
-          <td><code>LLM_JSON_TEMPERATURE</code></td>
-          <td><code>0.2</code></td>
-          <td>Temperature for JSON-strict calls</td>
-        </tr>
-        <tr>
-          <td><code>MAX_CONTEXT_TOKENS</code></td>
-          <td><code>8000</code></td>
-          <td>Max tokens per LLM prompt</td>
-        </tr>
-        <tr>
-          <td><code>PUBMED_MAX_RESULTS</code></td>
-          <td><code>150</code></td>
-          <td>Max PubMed abstracts per run</td>
-        </tr>
-        <tr>
-          <td><code>MOL_GENERATION_COUNT</code></td>
-          <td><code>20</code></td>
-          <td>Molecules generated before filtering</td>
-        </tr>
-        <tr>
-          <td><code>MOL_SHORTLIST_COUNT</code></td>
-          <td><code>5</code></td>
-          <td>Top molecules passed to docking</td>
-        </tr>
-        <tr>
-          <td><code>VINA_EXHAUSTIVENESS</code></td>
-          <td><code>8</code></td>
-          <td>AutoDock Vina search depth</td>
-        </tr>
-        <tr>
-          <td><code>ENABLE_CHEMICAL_SYNTHESIS</code></td>
-          <td><code>false</code></td>
-          <td>Enable synthesis route evaluation phase</td>
-        </tr>
-        <tr>
-          <td><code>ENABLE_PDF_REPORT</code></td>
-          <td><code>false</code></td>
-          <td>Generate PDF alongside Markdown report</td>
-        </tr>
-        <tr>
-          <td><code>ENABLE_LLM_CACHE</code></td>
-          <td><code>false</code></td>
-          <td>Cache LLM responses to disk</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- ── Footer ───────────────────────────────────────── -->
-<footer>
-  <p>
-    <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
-       target="_blank" rel="noopener noreferrer">Drug Discovery Pipeline V2</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2/blob/main/LICENSE"
-       target="_blank" rel="noopener noreferrer">MIT License</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/2am-dev" target="_blank"
-       rel="noopener noreferrer">@2am-dev</a>
-  </p>
-
-  <div class="footer-stack" role="list" aria-label="Tech stack">
-    <a class="stack-pill" href="https://ollama.ai"
-       target="_blank" rel="noopener noreferrer" role="listitem">
-       🦙 Ollama
-    </a>
-    <a class="stack-pill" href="https://ai.google.dev/gemma"
-       target="_blank" rel="noopener noreferrer" role="listitem">
-       💎 Gemma 4
-    </a>
-    <a class="stack-pill" href="https://www.rdkit.org"
-       target="_blank" rel="noopener noreferrer" role="listitem">
-       🧪 RDKit
-    </a>
-    <a class="stack-pill" href="https://www.trychroma.com"
-       target="_blank" rel="noopener noreferrer" role="listitem">
-       🗄️ ChromaDB
-    </a>
-    <a class="stack-pill" href="https://docs.pydantic.dev"
-       target="_blank" rel="noopener noreferrer" role="listitem">
-       ✅ Pydantic v2
-    </a>
-    <a class="stack-pill"
-       href="https://autodock-vina.readthedocs.io"
-       target="_blank" rel="noopener noreferrer" role="listitem">
-       🔬 AutoDock Vina
-    </a>
-  </div>
-</footer>
-
-<!-- Back to top -->
-<button id="btt" aria-label="Back to top" onclick="scrollToTop()">↑</button>
-
-<script>
-  /* ── Tab switching ─────────────────────────────── */
-  function switchTab(evt, id) {
-    const section = evt.currentTarget.closest('.code-section');
-    section.querySelectorAll('.code-tab').forEach(t => {
-      t.classList.remove('active');
-      t.setAttribute('aria-selected', 'false');
-    });
-    section.querySelectorAll('.tab-panel').forEach(p =>
-      p.classList.remove('active')
-    );
-    evt.currentTarget.classList.add('active');
-    evt.currentTarget.setAttribute('aria-selected', 'true');
-    section.querySelector('#tab-' + id).classList.add('active');
-  }
-
-  /* ── Copy to clipboard ─────────────────────────── */
-  function copyCode(btn) {
-    const text = btn.getAttribute('data-code');
-    navigator.clipboard.writeText(text).then(() => {
-      btn.textContent = '✅ Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = '📋 Copy';
-        btn.classList.remove('copied');
-      }, 2000);
-    }).catch(() => {
-      btn.textContent = '❌ Failed';
-      setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
-    });
-  }
-
-  /* ── Scroll-reveal ─────────────────────────────── */
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12 });
-
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  /* ── Budget bar animation ──────────────────────── */
-  const barObserver = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        document.getElementById('bar-prompt').style.width = '25%';
-        document.getElementById('bar-model').style.width  = '75%';
-        barObserver.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.3 });
-
-  const budgetWrap = document.querySelector('.budget-bar-wrap');
-  if (budgetWrap) barObserver.observe(budgetWrap);
-
-  /* ── Back to top ───────────────────────────────── */
-  const btt = document.getElementById('btt');
-  window.addEventListener('scroll', () => {
-    btt.classList.toggle('visible', window.scrollY > 400);
-  }, { passive: true });
-
-  function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+/* ── Back to top ─────────────────────────────────── */
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 </script>
 
 </body>
