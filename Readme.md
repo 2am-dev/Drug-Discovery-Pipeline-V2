@@ -397,53 +397,95 @@ ollama serve   # On local machine
 
 ```
 drug_discovery_pipeline/
-├── main.py                    # Entry point, CLI, pipeline orchestrator
-├── config.py                  # All configuration (env-aware dataclasses)
-├── .env.example               # Environment variable template
-├── requirements.txt           # Python dependencies
-├── README.md                  # This file
+├── .env                          # Secrets and API keys (never commit)
+├── .env.example                  # Safe environment variable template
+├── .gitignore                    # Git ignore rules
+├── .python-version               # Python version (3.11.9)
+├── pyproject.toml                # Project metadata and tool configuration
+├── Makefile                      # Convenience development commands
+├── requirements.txt             # Python dependencies
+├── README.md                    # Project documentation
 │
-├── agents/                    # Multi-agent pipeline stages
+├── main.py                      # Entry point and pipeline orchestrator
+├── config.py                    # Centralized configuration (env-aware dataclasses)
+│
+├── agents/                      # Multi-agent pipeline stages
 │   ├── __init__.py
-│   ├── planner.py             # Task graph builder (Phase 0)
-│   ├── retriever.py           # Literature + patent mining (Phase 1)
-│   ├── hypothesis.py          # Target selection + mechanism (Phase 2)
-│   ├── molecule_designer.py   # In silico molecule generation (Phase 3)
-│   ├── docking_evaluator.py   # AutoDock Vina binding affinity (Phase 4)
-│   ├── synthesis_evaluator.py # [OPTIONAL] Synthetic route proposal (Phase 5)
-│   └── report_compiler.py     # Markdown/PDF report generation (Phase 6)
+│   ├── planner.py               # Phase 0: task graph builder
+│   ├── retriever.py             # Phase 1: literature + patent mining
+│   ├── hypothesis.py            # Phase 2: target selection + mechanism analysis
+│   ├── molecule_designer.py     # Phase 3: in silico molecule generation
+│   ├── docking_evaluator.py     # Phase 4: binding affinity prediction
+│   ├── synthesis_evaluator.py   # Phase 5: synthetic route evaluation (optional)
+│   └── report_compiler.py       # Phase 6: markdown/pdf report generation
 │
-├── tools/                     # Standalone utility tools used by agents
+├── schemas/                     # Pydantic response schemas
 │   ├── __init__.py
-│   ├── literature_search.py   # PubMed + arXiv scraping
-│   ├── patent_search.py       # PatentsView API client
-│   ├── target_lookup.py       # UniProt REST API client
-│   ├── docking.py             # AutoDock Vina subprocess wrapper
-│   ├── molecule_generator.py  # RDKit molecule generation + filtering
-│   └── synthesis_checker.py   # [OPTIONAL] RDKit SA score calculator
+│   ├── planner.py               # PipelinePhase, PlannerResponse
+│   ├── retriever.py             # TargetCandidate, RetrieverResponse
+│   ├── hypothesis.py            # SelectedTarget, HypothesisResponse
+│   ├── molecule.py              # GeneratedMolecule, SynthesisResponse
+│   ├── docking.py               # DockingResult, DockingResponse
+│   └── report.py                # ReportMetadata, ReportResponse
 │
-├── utils/                     # Shared infrastructure utilities
+├── tools/                       # External scientific tooling and API wrappers
 │   ├── __init__.py
-│   ├── ollama_client.py       # Smart remote/local Ollama switching
-│   ├── json_validator.py      # JSON parsing, validation, retry logic
-│   ├── context_manager.py     # Token counting, chunking, summarisation
-│   ├── prompts.py             # JSON-enforced prompt templates
-│   └── helpers.py             # Logging setup, file I/O, env loading
+│   ├── literature_search.py     # PubMed ESearch/EFetch + arXiv integration
+│   ├── patent_search.py         # PatentsView REST API client
+│   ├── target_lookup.py         # UniProt REST API + RCSB PDB lookup
+│   ├── docking.py               # AutoDock Vina subprocess wrapper
+│   ├── molecule_generator.py    # RDKit property calculation and generation
+│   └── synthesis_checker.py     # RDKit synthetic accessibility scoring (optional)
 │
-├── schemas/                   # Pydantic v2 response schemas
+├── utils/                       # Shared infrastructure utilities
 │   ├── __init__.py
-│   ├── hypothesis.py          # HypothesisResponse, TargetSchema
-│   ├── molecule.py            # MoleculeSchema, MoleculeDesignResponse
-│   ├── docking.py             # DockingResultSchema, DockingResponse
-│   └── report.py             # ReportMetadata, ReportResponse
+│   ├── ollama_client.py         # Smart remote/local Ollama switching + retries
+│   ├── json_validator.py        # JSON parsing, validation, retry logic
+│   ├── context_manager.py       # Token counting, chunking, compression
+│   ├── prompts.py               # LLM prompt templates
+│   └── helpers.py               # Logging, file I/O, validation helpers
 │
-├── outputs/                   # Generated files (git-ignored)
-│   ├── pipeline_log.jsonl     # Full pipeline event log
-│   ├── error_log.jsonl        # Error events with raw LLM responses
-│   └── proposal_*.md          # Generated Markdown reports
+├── scripts/                     # Standalone utility scripts
+│   ├── check_ollama.py          # Pre-flight Ollama connectivity check
+│   ├── clear_vectorstore.py     # Reset ChromaDB persistence
+│   └── export_report.py         # Markdown → PDF converter
 │
-└── data/
-    └── vectorstore/           # ChromaDB persistent embeddings (git-ignored)
+├── tests/                       # Automated test suite
+│   ├── __init__.py
+│   ├── conftest.py              # Shared pytest fixtures
+│   │
+│   ├── test_utils/
+│   │   ├── __init__.py
+│   │   ├── test_json_validator.py
+│   │   ├── test_context_manager.py
+│   │   └── test_ollama_client.py
+│   │
+│   ├── test_schemas/
+│   │   ├── __init__.py
+│   │   ├── test_hypothesis.py
+│   │   ├── test_molecule.py
+│   │   └── test_docking.py
+│   │
+│   └── test_tools/
+│       ├── __init__.py
+│       └── test_molecule_generator.py
+│
+├── docker/
+│   ├── Dockerfile               # Container image definition
+│   └── docker-compose.yml       # Multi-service orchestration
+│
+├── outputs/                     # Runtime-generated outputs (git-ignored)
+│   ├── .gitkeep
+│   ├── reports/
+│   │   └── .gitkeep
+│   └── poses/
+│       └── .gitkeep
+│
+└── data/                        # Runtime-generated data (git-ignored)
+    ├── .gitkeep
+    ├── vectorstore/             # ChromaDB persistent embeddings
+    ├── pdb/                     # Cached protein structure files
+    └── llm_cache/               # Cached LLM responses
 ```
 
 ---
