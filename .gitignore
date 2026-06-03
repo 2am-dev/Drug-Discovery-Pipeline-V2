@@ -1,0 +1,121 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# .gitignore — Drug Discovery Pipeline
+# Place at: drug_discovery_pipeline/.gitignore   (project root)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Environment & secrets ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+!.env.example          # Keep the example template in git
+
+# ── Python cache ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.virtualenv/
+.conda/
+
+# ── Build artefacts ───────────────────────────────────────────────────────────
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+MANIFEST
+
+# ── Type checking & linting ───────────────────────────────────────────────────
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.junit.xml
+.tox/
+.nox/
+
+# ── Pipeline outputs (generated at runtime — do NOT commit) ───────────────────
+outputs/
+!outputs/.gitkeep         # Keep the empty outputs/ directory in git
+
+# ── Pipeline data (large files — do NOT commit) ───────────────────────────────
+data/vectorstore/
+data/llm_cache/
+data/pdb/
+!data/.gitkeep
+
+# ── Downloaded ML model files ─────────────────────────────────────────────────
+*.pth
+*.pt
+*.onnx
+*.safetensors
+*.bin
+*.h5
+
+# ── HuggingFace cache (very large — use HF_HOME to redirect) ─────────────────
+.cache/huggingface/
+
+# ── Molecular docking intermediate files ─────────────────────────────────────
+*.pdbqt
+*.sdf
+*.mol2
+*.dlg
+outputs/poses/
+!outputs/poses/.gitkeep
+
+# ── Jupyter notebooks ─────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── IDE & editor files ────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Documentation build ───────────────────────────────────────────────────────
+docs/_build/
+docs/.doctrees/
+site/
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+docker/.env
+
+# ── Temporary files ───────────────────────────────────────────────────────────
+*.tmp
+*.temp
+*.bak
+*.log
+!outputs/*.log           # Keep pipeline logs if you want them tracked
+tmp/
+temp/
+
+# ── OS-specific ───────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

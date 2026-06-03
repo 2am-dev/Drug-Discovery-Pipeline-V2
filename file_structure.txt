@@ -1,0 +1,88 @@
+drug_discovery_pipeline/
+│
+├── .env                                    ← your secrets, never commit
+├── .env.example                            ← safe template, committed to git
+├── .gitignore                              ← committed to git
+├── .python-version                         ← contains: 3.11.9
+├── pyproject.toml                          ← project metadata + tool config
+├── Makefile                                ← convenience commands
+├── requirements.txt                        ← pip dependencies
+├── README.md                               ← full documentation
+│
+├── main.py                                 ← entry point + pipeline orchestrator
+├── config.py                               ← all configuration (env-aware dataclasses)
+│
+├── agents/
+│   ├── __init__.py
+│   ├── planner.py                          ← phase 0: task graph builder
+│   ├── retriever.py                        ← phase 1: literature + patent mining
+│   ├── hypothesis.py                       ← phase 2: target selection + mechanism
+│   ├── molecule_designer.py               ← phase 3: in silico molecule generation
+│   ├── docking_evaluator.py               ← phase 4: binding affinity prediction
+│   ├── synthesis_evaluator.py             ← phase 5: synthetic routes (optional)
+│   └── report_compiler.py                 ← phase 6: markdown/pdf report
+│
+├── schemas/
+│   ├── __init__.py
+│   ├── planner.py                          ← PipelinePhase, PlannerResponse
+│   ├── retriever.py                        ← TargetCandidate, RetrieverResponse
+│   ├── hypothesis.py                       ← SelectedTarget, HypothesisResponse
+│   ├── molecule.py                         ← GeneratedMolecule, SynthesisResponse
+│   ├── docking.py                          ← DockingResult, DockingResponse
+│   └── report.py                           ← ReportMetadata, ReportResponse
+│
+├── tools/
+│   ├── __init__.py
+│   ├── literature_search.py               ← pubmed esearch/efetch + arxiv atom
+│   ├── patent_search.py                   ← patentsview rest api client
+│   ├── target_lookup.py                   ← uniprot rest api + rcsb pdb
+│   ├── docking.py                         ← autodock vina subprocess wrapper
+│   ├── molecule_generator.py              ← rdkit property calculator
+│   └── synthesis_checker.py               ← rdkit sa score (optional)
+│
+├── utils/
+│   ├── __init__.py
+│   ├── ollama_client.py                   ← smart remote/local switching + retry
+│   ├── json_validator.py                  ← json parsing, validation, retry logic
+│   ├── context_manager.py                 ← token counting, chunking, compression
+│   ├── prompts.py                         ← all llm prompt templates
+│   └── helpers.py                         ← logging, file i/o, validation utils
+│
+├── scripts/
+│   ├── check_ollama.py                    ← pre-flight connectivity checker
+│   ├── clear_vectorstore.py               ← wipe chromadb between runs
+│   └── export_report.py                   ← standalone md→pdf converter
+│
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py                         ← shared pytest fixtures
+│   ├── test_utils/
+│   │   ├── __init__.py
+│   │   ├── test_json_validator.py
+│   │   ├── test_context_manager.py
+│   │   └── test_ollama_client.py
+│   ├── test_schemas/
+│   │   ├── __init__.py
+│   │   ├── test_hypothesis.py
+│   │   ├── test_molecule.py
+│   │   └── test_docking.py
+│   └── test_tools/
+│       ├── __init__.py
+│       └── test_molecule_generator.py
+│
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+├── outputs/                               ← generated at runtime (gitignored)
+│   ├── .gitkeep
+│   ├── reports/
+│   │   └── .gitkeep
+│   └── poses/
+│       └── .gitkeep
+│
+└── data/                                  ← generated at runtime (gitignored)
+    ├── .gitkeep
+    ├── vectorstore/                       ← chromadb persistence
+    ├── pdb/                               ← cached pdb structure files
+    └── llm_cache/                         ← cached llm responses (if enabled)

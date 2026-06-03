@@ -1,0 +1,210 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# pyproject.toml — Drug Discovery Pipeline project metadata and tool config
+# Place at: drug_discovery_pipeline/pyproject.toml   (project root)
+# ─────────────────────────────────────────────────────────────────────────────
+
+[build-system]
+requires      = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+# ── Project metadata ──────────────────────────────────────────────────────────
+[project]
+name            = "drug-discovery-pipeline"
+version         = "1.0.0"
+description     = "End-to-end drug discovery hypothesis-to-report pipeline powered by Ollama LLMs"
+readme          = "README.md"
+license         = { text = "MIT" }
+requires-python = ">=3.10"
+
+authors = [
+    { name = "Your Name", email = "your-email@example.com" },
+]
+
+keywords = [
+    "drug-discovery",
+    "cheminformatics",
+    "large-language-models",
+    "ollama",
+    "molecular-docking",
+    "bioinformatics",
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+# Core runtime dependencies (mirrors requirements.txt)
+dependencies = [
+    "openai>=1.12.0",
+    "chromadb>=0.4.22",
+    "pydantic>=2.5.0",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "feedparser>=6.0.10",
+    "lxml>=4.9.3",
+    "pandas>=2.1.0",
+    "numpy>=1.26.0",
+    "tenacity>=8.2.3",
+    "tiktoken>=0.5.2",
+    "transformers>=4.35.0",
+    "tokenizers>=0.15.0",
+    "loguru>=0.7.2",
+    "python-dotenv>=1.0.0",
+    "aiohttp>=3.9.0",
+    "aiofiles>=23.2.1",
+    "markdown>=3.5.1",
+]
+
+# Optional dependency groups
+[project.optional-dependencies]
+rdkit = [
+    "rdkit>=2023.9.1",
+]
+pdf = [
+    "weasyprint>=60.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-mock>=3.12.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.0",
+    "ruff>=0.1.9",
+    "mypy>=1.8.0",
+    "types-requests>=2.31.0",
+    "types-beautifulsoup4>=4.12.0",
+    "ipython>=8.18.0",
+]
+all = [
+    "drug-discovery-pipeline[rdkit,pdf,dev]",
+]
+
+# CLI entry point
+[project.scripts]
+drug-discovery = "main:main"
+
+# ── Setuptools configuration ──────────────────────────────────────────────────
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["agents*", "tools*", "utils*", "schemas*"]
+exclude = ["tests*", "scripts*", "docker*"]
+
+# ── pytest configuration ──────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths       = ["tests"]
+asyncio_mode    = "auto"
+python_files    = ["test_*.py"]
+python_classes  = ["Test*"]
+python_functions = ["test_*"]
+addopts         = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=.",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-omit=tests/*,scripts/*,docker/*",
+]
+markers = [
+    "slow: marks tests that require network or GPU (deselect with -m 'not slow')",
+    "integration: marks tests that hit real Ollama endpoints",
+    "requires_rdkit: marks tests that need RDKit installed",
+    "requires_vina: marks tests that need AutoDock Vina binary",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# ── Black formatter ───────────────────────────────────────────────────────────
+[tool.black]
+line-length    = 88
+target-version = ["py310", "py311", "py312"]
+include        = '\.pyi?$'
+exclude        = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+  | __pycache__
+)/
+'''
+
+# ── Ruff linter ───────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length    = 88
+target-version = "py310"
+src            = ["."]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "UP",    # pyupgrade
+    "SIM",   # flake8-simplify
+    "TCH",   # flake8-type-checking
+]
+ignore = [
+    "E501",  # line length (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "B904",  # raise from exc (we use explicit re-raise in some places)
+    "SIM108",# ternary operator (readability preference)
+]
+# Allow unused imports in __init__.py files (re-exports)
+per-file-ignores = { "__init__.py" = ["F401"] }
+
+[tool.ruff.lint.isort]
+known-first-party = ["agents", "tools", "utils", "schemas", "config"]
+
+# ── mypy type checker ─────────────────────────────────────────────────────────
+[tool.mypy]
+python_version         = "3.11"
+warn_return_any        = true
+warn_unused_configs    = true
+ignore_missing_imports = true   # many deps lack stubs
+disallow_untyped_defs  = false  # relaxed — agents use complex dynamic typing
+check_untyped_defs     = true
+show_error_codes       = true
+
+[[tool.mypy.overrides]]
+module = [
+    "rdkit.*",
+    "chromadb.*",
+    "feedparser.*",
+    "meeko.*",
+]
+ignore_missing_imports = true
+
+# ── Coverage configuration ────────────────────────────────────────────────────
+[tool.coverage.run]
+source   = ["."]
+omit     = [
+    "tests/*",
+    "scripts/*",
+    "docker/*",
+    ".venv/*",
+    "setup.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

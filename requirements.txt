@@ -1,0 +1,67 @@
+# ── Core LLM client ───────────────────────────────────────────────────────────
+openai>=1.12.0
+
+# ── Vector store ──────────────────────────────────────────────────────────────
+chromadb>=0.4.22
+
+# ── Data validation ───────────────────────────────────────────────────────────
+pydantic>=2.5.0
+
+# ── HTTP / scraping ───────────────────────────────────────────────────────────
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+feedparser>=6.0.10
+lxml>=4.9.3            # faster BS4 parser
+
+# ── Data manipulation ─────────────────────────────────────────────────────────
+pandas>=2.1.0
+numpy>=1.26.0
+
+# ── Cheminformatics ───────────────────────────────────────────────────────────
+# Install via: pip install rdkit
+# Or conda:    conda install -c conda-forge rdkit
+rdkit>=2023.9.1
+
+# ── Retry logic ───────────────────────────────────────────────────────────────
+tenacity>=8.2.3
+
+# ── Token counting ────────────────────────────────────────────────────────────
+tiktoken>=0.5.2
+transformers>=4.35.0   # For accurate Gemma token counting
+tokenizers>=0.15.0     # Required by transformers
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+loguru>=0.7.2
+
+# ── Environment management ────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── Async utilities ───────────────────────────────────────────────────────────
+aiohttp>=3.9.0         # For async health checks
+aiofiles>=23.2.1       # Async file I/O for report writing
+
+# ── Report generation ─────────────────────────────────────────────────────────
+markdown>=3.5.1        # Markdown → HTML conversion
+# Optional PDF support — uncomment ONE of the following:
+# weasyprint>=60.0     # PDF via WeasyPrint (requires libpango)
+# pypandoc>=1.12       # PDF via Pandoc (requires pandoc binary)
+
+# ── Development / testing ─────────────────────────────────────────────────────
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+pytest-mock>=3.12.0
+black>=23.12.0
+ruff>=0.1.9
+mypy>=1.8.0
+
+# ── Optional: molecular visualisation ────────────────────────────────────────
+# py3Dmol>=2.0.3       # 3-D molecular viewer in Jupyter
+# matplotlib>=3.8.0    # 2-D structure diagrams
+
+# ── Platform notes ────────────────────────────────────────────────────────────
+# RDKit on Linux/macOS: pip install rdkit
+# RDKit on Windows:     conda install -c conda-forge rdkit
+# AutoDock Vina:        https://vina.scripps.edu/downloads/
+#                       Add vina binary to PATH before running pipeline.
+# Transformers models:  Downloaded automatically on first use to ~/.cache/huggingface
+#                       Set HF_HOME env var to change cache location.

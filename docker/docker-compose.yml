@@ -1,0 +1,88 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker/docker-compose.yml — Full stack for local development
+# Place at: drug_discovery_pipeline/docker/docker-compose.yml
+#
+# Services:
+#   ollama    — Local Ollama server with GPU passthrough
+#   pipeline  — Drug discovery pipeline (connects to ollama service)
+#
+# Usage:
+#   docker compose -f docker/docker-compose.yml up -d
+#   docker compose -f docker/docker-compose.yml run pipeline \
+#       --indication "NSCLC" --local-only
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Ollama server ─────────────────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: drug_discovery_ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    # GPU passthrough — comment out if no NVIDIA GPU available
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── Model initialisation (runs once, then exits) ──────────────────────────
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: drug_discovery_ollama_init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        ollama pull gemma4:31b-it-q8_0 &&
+        ollama pull nomic-embed-text &&
+        echo 'Models ready.'
+      "
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: "no"
+
+  # ── Drug Discovery Pipeline ───────────────────────────────────────────────
+  pipeline:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: drug_discovery_pipeline
+    depends_on:
+      ollama:
+        condition: service_healthy
+    env_file:
+      - ../.env
+    environment:
+      # Override remote URL to use the ollama service name
+      - OLLAMA_REMOTE_URL=http://ollama:11434/v1
+      - OLLAMA_LOCAL_URL=http://ollama:11434/v1
+    volumes:
+      # Persist outputs and data outside the container
+      - ../outputs:/app/outputs
+      - ../data:/app/data
+    # Default command — override at runtime
+    command: ["--indication", "non-small cell lung cancer"]
+    restart: "no"
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  ollama_models:
+    driver: local
