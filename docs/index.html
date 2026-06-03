@@ -3,24 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Drug Discovery Pipeline</title>
+  <meta name="description"
+        content="An autonomous multi-agent drug discovery pipeline — from disease
+                 indication to project proposal report, no human intervention required." />
+  <meta property="og:title"        content="Drug Discovery Pipeline V2" />
+  <meta property="og:description"  content="Hypothesis-to-Report · Multi-Agent · Ollama · RDKit" />
+  <meta property="og:url"          content="https://2am-dev.github.io/Drug-Discovery-Pipeline-V2/" />
+  <meta property="og:type"         content="website" />
+  <title>Drug Discovery Pipeline V2</title>
+
   <style>
-    /* ── Reset & Base ────────────────────────────── */
+    /* ── Reset ──────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── Design Tokens ──────────────────────────────── */
     :root {
-      --bg:          #0d1117;
-      --surface:     #161b22;
-      --surface2:    #21262d;
-      --border:      #30363d;
-      --accent:      #238636;
-      --accent-alt:  #1f6feb;
-      --text:        #e6edf3;
-      --text-muted:  #8b949e;
-      --tag-bg:      #1c2a16;
-      --tag-text:    #56d364;
-      --radius:      10px;
-      --font-mono:   'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+      --bg:           #0d1117;
+      --bg-alt:       #010409;
+      --surface:      #161b22;
+      --surface2:     #21262d;
+      --border:       #30363d;
+      --border-hover: #6e7681;
+
+      --accent:       #238636;
+      --accent-hover: #2ea043;
+      --accent-glow:  rgba(35,134,54,0.35);
+
+      --blue:         #1f6feb;
+      --blue-subtle:  #161b22;
+      --purple:       #8b949e;
+
+      --text:         #e6edf3;
+      --text-muted:   #8b949e;
+      --text-subtle:  #6e7681;
+
+      --tag-bg:       #1c2a16;
+      --tag-text:     #56d364;
+      --tag-border:   rgba(46,160,67,.3);
+
+      --radius-sm:    6px;
+      --radius:       10px;
+      --radius-lg:    16px;
+
+      --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica,
+              Arial, sans-serif;
+
+      --transition: 0.2s ease;
     }
 
     html { scroll-behavior: smooth; }
@@ -28,21 +57,43 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-                   Helvetica, Arial, sans-serif;
+      font-family: var(--sans);
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    a { color: var(--accent-alt); text-decoration: none; }
+    a { color: var(--blue); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* ── Nav ─────────────────────────────────────── */
+    img { max-width: 100%; height: auto; }
+
+    /* ── Utility ─────────────────────────────────────── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    /* ── Skip Link ───────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 0 0 var(--radius-sm) 0;
+      z-index: 9999;
+      font-weight: 600;
+      transition: top var(--transition);
+    }
+    .skip-link:focus { top: 0; }
+
+    /* ── Navigation ──────────────────────────────────── */
     nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(13, 17, 23, 0.92);
-      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       padding: 0 2rem;
       display: flex;
@@ -53,36 +104,78 @@
 
     .nav-brand {
       font-weight: 700;
-      font-size: 1rem;
+      font-size: .95rem;
       color: var(--text);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: .5rem;
+      white-space: nowrap;
     }
 
-    .nav-brand svg { width: 22px; height: 22px; fill: var(--accent); }
+    .nav-brand svg { flex-shrink: 0; }
 
     .nav-links {
       display: flex;
-      gap: 1.5rem;
+      align-items: center;
+      gap: 1.4rem;
       list-style: none;
     }
 
     .nav-links a {
       color: var(--text-muted);
-      font-size: 0.9rem;
-      transition: color 0.2s;
+      font-size: .88rem;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    .nav-gh {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: .35rem .75rem;
+      color: var(--text) !important;
+      font-size: .82rem;
+      font-weight: 600;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .nav-gh:hover {
+      background: var(--border);
+      text-decoration: none !important;
+      border-color: var(--border-hover);
     }
 
-    .nav-links a:hover {
-      color: var(--text);
-      text-decoration: none;
+    /* ── Hero ────────────────────────────────────────── */
+    .hero-wrap {
+      position: relative;
+      overflow: hidden;
     }
 
-    /* ── Hero ────────────────────────────────────── */
+    /* subtle dot-grid background */
+    .hero-wrap::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    /* bottom fade into page bg */
+    .hero-wrap::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 120px;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+      pointer-events: none;
+    }
+
     .hero {
+      position: relative;
       text-align: center;
-      padding: 6rem 2rem 4rem;
+      padding: 6rem 2rem 5rem;
       max-width: 860px;
       margin: 0 auto;
     }
@@ -90,34 +183,35 @@
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: .5rem;
       background: var(--tag-bg);
       color: var(--tag-text);
-      border: 1px solid #2ea04326;
+      border: 1px solid var(--tag-border);
       border-radius: 50px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      letter-spacing: 0.04em;
+      padding: .3rem 1rem;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 1.6rem;
     }
 
     .hero h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-size: clamp(2rem, 6vw, 3.4rem);
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.12;
       margin-bottom: 1.2rem;
-      background: linear-gradient(135deg, #e6edf3 0%, #8b949e 100%);
+      background: linear-gradient(140deg, #e6edf3 20%, #6e7681 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .hero p {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
-      max-width: 620px;
-      margin: 0 auto 2.5rem;
+      max-width: 580px;
+      margin: 0 auto 2.4rem;
     }
 
     .hero-actions {
@@ -125,31 +219,39 @@
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 2.8rem;
     }
 
+    /* ── Buttons ─────────────────────────────────────── */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.65rem 1.4rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      gap: .45rem;
+      padding: .65rem 1.4rem;
+      border-radius: var(--radius-sm);
+      font-size: .92rem;
       font-weight: 600;
-      transition: all 0.2s;
       cursor: pointer;
       border: none;
+      font-family: var(--sans);
+      transition: transform var(--transition), box-shadow var(--transition),
+                  background var(--transition), border-color var(--transition);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
     }
 
     .btn-primary {
       background: var(--accent);
       color: #fff;
     }
-
     .btn-primary:hover {
-      background: #2ea043;
-      text-decoration: none;
+      background: var(--accent-hover);
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(35, 134, 54, 0.35);
+      box-shadow: 0 4px 18px var(--accent-glow);
+      text-decoration: none;
     }
 
     .btn-secondary {
@@ -157,62 +259,58 @@
       color: var(--text);
       border: 1px solid var(--border);
     }
-
     .btn-secondary:hover {
       background: var(--border);
-      text-decoration: none;
+      border-color: var(--border-hover);
       transform: translateY(-1px);
+      text-decoration: none;
     }
 
-    /* ── Badges ──────────────────────────────────── */
+    /* ── Badges row ──────────────────────────────────── */
     .badges {
       display: flex;
       justify-content: center;
-      gap: 0.6rem;
+      gap: .5rem;
       flex-wrap: wrap;
-      margin-bottom: 3rem;
     }
+    .badges img { height: 22px; border-radius: 3px; }
 
-    .badges img { height: 22px; }
+    /* ── Divider ─────────────────────────────────────── */
+    .divider { border: none; border-top: 1px solid var(--border); }
 
-    /* ── Section base ────────────────────────────── */
+    /* ── Sections ────────────────────────────────────── */
     section {
-      max-width: 1000px;
+      max-width: 1040px;
       margin: 0 auto;
-      padding: 4rem 2rem;
+      padding: 4.5rem 2rem;
     }
 
     .section-label {
-      font-size: 0.78rem;
+      font-size: .72rem;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: .12em;
       text-transform: uppercase;
-      color: var(--accent-alt);
-      margin-bottom: 0.6rem;
+      color: var(--blue);
+      margin-bottom: .55rem;
     }
 
     .section-title {
-      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-size: clamp(1.4rem, 3vw, 2rem);
       font-weight: 700;
-      margin-bottom: 1rem;
+      margin-bottom: .8rem;
     }
 
     .section-sub {
       color: var(--text-muted);
-      max-width: 600px;
+      max-width: 620px;
       margin-bottom: 2.5rem;
+      font-size: .975rem;
     }
 
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 0 2rem;
-    }
-
-    /* ── Pipeline Flow ───────────────────────────── */
+    /* ── Pipeline Grid ───────────────────────────────── */
     .pipeline {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
       gap: 1rem;
     }
 
@@ -220,44 +318,49 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.4rem;
-      position: relative;
-      transition: border-color 0.2s, transform 0.2s;
+      padding: 1.5rem;
+      transition: border-color var(--transition), transform var(--transition),
+                  box-shadow var(--transition);
+      cursor: default;
+    }
+    .phase-card:hover {
+      border-color: var(--blue);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(31,111,235,.15);
     }
 
-    .phase-card:hover {
-      border-color: var(--accent-alt);
-      transform: translateY(-2px);
-    }
+    .phase-icon { font-size: 1.7rem; margin-bottom: .65rem; }
 
     .phase-number {
-      font-size: 0.75rem;
+      font-size: .7rem;
       font-weight: 700;
-      color: var(--accent-alt);
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
+      color: var(--blue);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .35rem;
     }
 
-    .phase-card h3 {
-      font-size: 1rem;
+    .phase-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .phase-card p  { font-size: .85rem; color: var(--text-muted); }
+
+    .phase-optional {
+      display: inline-block;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: .68rem;
       font-weight: 700;
-      margin-bottom: 0.4rem;
+      color: var(--text-subtle);
+      padding: .1rem .45rem;
+      margin-left: .5rem;
+      vertical-align: middle;
+      letter-spacing: .05em;
     }
 
-    .phase-card p {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-
-    .phase-icon {
-      font-size: 1.6rem;
-      margin-bottom: 0.7rem;
-    }
-
-    /* ── Feature Grid ────────────────────────────── */
+    /* ── Features Grid ───────────────────────────────── */
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 1rem;
     }
 
@@ -266,31 +369,31 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.5rem;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .feature:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
     }
 
     .feature-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      margin-bottom: .9rem;
+      display: block;
     }
 
     .feature h3 {
-      font-size: 0.95rem;
+      font-size: .93rem;
       font-weight: 700;
-      margin-bottom: 0.4rem;
+      margin-bottom: .4rem;
     }
 
     .feature p {
-      font-size: 0.85rem;
+      font-size: .85rem;
       color: var(--text-muted);
     }
 
-    /* ── Code Block ──────────────────────────────── */
+    /* ── Code / Tabs ─────────────────────────────────── */
     .code-section {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -302,224 +405,483 @@
       display: flex;
       border-bottom: 1px solid var(--border);
       background: var(--surface2);
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .code-tabs::-webkit-scrollbar { display: none; }
 
     .code-tab {
-      padding: 0.7rem 1.2rem;
-      font-size: 0.85rem;
+      padding: .65rem 1.1rem;
+      font-size: .84rem;
+      font-weight: 500;
       color: var(--text-muted);
       cursor: pointer;
+      border: none;
       border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-      background: none;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-      color: var(--text-muted);
-      font-family: inherit;
+      background: transparent;
+      font-family: var(--sans);
+      transition: color var(--transition), border-color var(--transition);
+      white-space: nowrap;
     }
-
+    .code-tab:hover { color: var(--text); }
     .code-tab.active {
       color: var(--text);
-      border-bottom-color: var(--accent-alt);
+      border-bottom-color: var(--blue);
+    }
+    .code-tab:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: -2px;
     }
 
-    .code-content {
-      padding: 1.4rem;
-      overflow-x: auto;
-    }
-
-    .code-content pre {
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      line-height: 1.7;
-      color: #e6edf3;
-    }
+    .code-body { padding: 1.5rem; overflow-x: auto; }
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* syntax colours */
-    .c-comment { color: #8b949e; }
+    .code-body pre {
+      font-family: var(--mono);
+      font-size: .84rem;
+      line-height: 1.75;
+      color: #e6edf3;
+    }
+
+    /* Syntax colours */
+    .c-comment { color: #8b949e; font-style: italic; }
+    .c-cmd     { color: #56d364; }
     .c-flag    { color: #79c0ff; }
     .c-string  { color: #a5d6ff; }
-    .c-cmd     { color: #56d364; }
+    .c-key     { color: #ff7b72; }
+    .c-val     { color: #ffa657; }
 
-    /* ── Connectivity Flow ───────────────────────── */
-    .flow-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      font-family: var(--font-mono);
-      font-size: 0.88rem;
-      line-height: 2;
-    }
-
-    .flow-step {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .flow-badge {
-      background: var(--accent-alt);
-      color: #fff;
-      border-radius: 4px;
-      padding: 0.15rem 0.5rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .flow-badge.fallback { background: #d29922; }
-    .flow-badge.error    { background: #da3633; }
-
-    .flow-arrow {
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      padding-left: 2rem;
-    }
-
-    /* ── Config Table ────────────────────────────── */
-    .config-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    .config-table th {
-      text-align: left;
-      padding: 0.7rem 1rem;
-      background: var(--surface2);
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .config-table td {
-      padding: 0.7rem 1rem;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-
-    .config-table tr:last-child td { border-bottom: none; }
-    .config-table tr:hover td { background: var(--surface2); }
-
+    /* inline code */
     code {
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 4px;
-      padding: 0.15em 0.45em;
-      font-family: var(--font-mono);
-      font-size: 0.85em;
+      padding: .15em .45em;
+      font-family: var(--mono);
+      font-size: .84em;
       color: #a5d6ff;
     }
 
-    /* ── Footer ──────────────────────────────────── */
+    /* ── Copy button ─────────────────────────────────── */
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .code-lang {
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--text-subtle);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-family: var(--sans);
+      font-size: .75rem;
+      padding: .25rem .6rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .copy-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+    .copy-btn.copied {
+      background: var(--tag-bg);
+      border-color: var(--tag-border);
+      color: var(--tag-text);
+    }
+
+    /* ── Connectivity Flow ───────────────────────────── */
+    .flow-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2rem 1.5rem;
+      font-family: var(--mono);
+      font-size: .875rem;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      padding: .5rem 0;
+    }
+
+    .flow-connector {
+      padding: .15rem 0 .15rem 1.1rem;
+      color: var(--text-subtle);
+      font-size: .8rem;
+      line-height: 1.4;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm);
+      font-size: .75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      padding: 0 .4rem;
+    }
+    .badge-blue    { background: var(--blue);  color: #fff; }
+    .badge-yellow  { background: #d29922;      color: #000; }
+    .badge-red     { background: #da3633;      color: #fff; }
+
+    /* ── Config Table ────────────────────────────────── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+
+    thead th {
+      text-align: left;
+      padding: .75rem 1rem;
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: .7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface2); }
+
+    td:first-child code { color: #ffa657; }
+
+    /* ── Stats Bar ───────────────────────────────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat {
+      background: var(--surface);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e6edf3, #8b949e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: .2rem;
+    }
+
+    /* ── Token Budget ────────────────────────────────── */
+    .budget-bar-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+
+    .budget-bar {
+      height: 12px;
+      border-radius: 50px;
+      background: var(--surface2);
+      overflow: hidden;
+      margin: .8rem 0;
+      position: relative;
+    }
+
+    .budget-fill {
+      height: 100%;
+      border-radius: 50px;
+      background: linear-gradient(90deg, var(--accent) 0%, #56d364 100%);
+      transition: width 1.2s cubic-bezier(.25,.8,.25,1);
+    }
+
+    .budget-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Footer ──────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
       text-align: center;
-      padding: 2.5rem;
+      padding: 2.5rem 2rem;
       color: var(--text-muted);
-      font-size: 0.875rem;
+      font-size: .875rem;
     }
 
     footer a { color: var(--text-muted); }
-    footer a:hover { color: var(--text); }
+    footer a:hover { color: var(--text); text-decoration: none; }
 
-    /* ── Responsive ──────────────────────────────── */
-    @media (max-width: 640px) {
-      nav { padding: 0 1rem; }
-      .nav-links { gap: 1rem; }
-      .nav-links a { font-size: 0.82rem; }
-      section { padding: 3rem 1rem; }
+    .footer-stack {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .4rem .8rem;
+      margin-top: .6rem;
     }
+
+    .stack-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: .2rem .7rem;
+      font-size: .75rem;
+      color: var(--text-muted);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .stack-pill:hover {
+      border-color: var(--border-hover);
+      color: var(--text);
+    }
+
+    /* ── Scroll-reveal ───────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ──────────────────────────────────── */
+    @media (max-width: 700px) {
+      nav { padding: 0 1rem; }
+      .nav-links { gap: .8rem; }
+      .nav-links li.hide-sm { display: none; }
+      section { padding: 3rem 1rem; }
+      .hero { padding: 4rem 1rem 3.5rem; }
+      .flow-box { padding: 1.2rem; font-size: .78rem; }
+    }
+
+    /* ── Back-to-top ─────────────────────────────────── */
+    #btt {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity var(--transition), transform var(--transition),
+                  background var(--transition);
+      z-index: 90;
+    }
+    #btt.visible { opacity: 1; transform: translateY(0); }
+    #btt:hover { background: var(--border); }
   </style>
 </head>
 <body>
 
+<!-- Skip nav for accessibility -->
+<a class="skip-link" href="#main">Skip to main content</a>
+
 <!-- ── Navigation ──────────────────────────────────── -->
-<nav>
+<nav aria-label="Main navigation">
   <div class="nav-brand">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 
-               17.93V18a1 1 0 0 0-2 0v1.93A8 8 0 0 1 
-               4.07 13H6a1 1 0 0 0 0-2H4.07A8 8 0 0 1 
-               11 4.07V6a1 1 0 0 0 2 0V4.07A8 8 0 0 1 
-               19.93 11H18a1 1 0 0 0 0 2h1.93A8 8 0 0 1 
-               13 19.93z"/>
+    <svg width="22" height="22" viewBox="0 0 24 24"
+         fill="none" stroke="#56d364" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83
+               M16.24 16.24l2.83 2.83M2 12h4M18 12h4
+               M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
     </svg>
-    Drug Discovery Pipeline
+    Drug Discovery Pipeline&nbsp;<span style="color:var(--text-subtle)">V2</span>
   </div>
-  <ul class="nav-links">
-    <li><a href="#pipeline">Pipeline</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#quickstart">Quick Start</a></li>
-    <li><a href="#config">Config</a></li>
-    <li><a href="https://github.com/your-username/drug_discovery_pipeline">GitHub</a></li>
+
+  <ul class="nav-links" role="list">
+    <li class="hide-sm"><a href="#pipeline">Pipeline</a></li>
+    <li class="hide-sm"><a href="#features">Features</a></li>
+    <li class="hide-sm"><a href="#quickstart">Quick&nbsp;Start</a></li>
+    <li class="hide-sm"><a href="#config">Config</a></li>
+    <li>
+      <a class="nav-gh"
+         href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
+         target="_blank" rel="noopener noreferrer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+             aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205
+                   11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015
+                   -2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72
+                   -1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015
+                   1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105
+                   -.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925
+                   0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18
+                   0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135
+                   3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12
+                   3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625
+                   -5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015
+                   2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0
+                   24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        GitHub
+      </a>
+    </li>
   </ul>
 </nav>
 
 <!-- ── Hero ────────────────────────────────────────── -->
-<div class="hero">
-  <div class="hero-badge">
-    ⚗️ &nbsp;Multi-Agent · Autonomous · End-to-End
-  </div>
-  <h1>Drug Discovery<br/>Hypothesis-to-Report Pipeline</h1>
-  <p>
-    An autonomous multi-agent system that accepts a disease indication or
-    biological target as input and produces a comprehensive project proposal
-    report — no human intervention required.
-  </p>
+<div class="hero-wrap">
+  <div class="hero" id="main">
+    <div class="hero-badge" aria-label="Multi-Agent Autonomous Pipeline">
+      ⚗️ &nbsp;Multi-Agent · Autonomous · End-to-End
+    </div>
 
-  <div class="badges">
-    <img src="https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python&logoColor=white" alt="Python">
-    <img src="https://img.shields.io/badge/Ollama-Remote%20%7C%20Local-green?style=flat-square" alt="Ollama">
-    <img src="https://img.shields.io/badge/Pydantic-v2-E92063?style=flat-square" alt="Pydantic">
-    <img src="https://img.shields.io/badge/RDKit-cheminformatics-blue?style=flat-square" alt="RDKit">
-    <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="License">
-  </div>
+    <h1>Drug Discovery<br/>Hypothesis‑to‑Report</h1>
 
-  <div class="hero-actions">
-    <a class="btn btn-primary"
-       href="https://github.com/your-username/drug_discovery_pipeline">
-      <!-- GitHub icon -->
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 
-                 9.795 8.205 11.385.6.105.825-.255.825-.57 
-                 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41
-                 -.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945
-                 -.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105
-                 -.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 
-                 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 
-                 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 
-                 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 
-                 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 
-                 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 
-                 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63
-                 -5.37-12-12-12z"/>
-      </svg>
-      View on GitHub
-    </a>
-    <a class="btn btn-secondary" href="#quickstart">
-      🚀 Quick Start
-    </a>
-    <a class="btn btn-secondary" href="#pipeline">
-      📐 Architecture
-    </a>
+    <p>
+      Accept a disease indication or biological target — receive a
+      comprehensive project proposal report. Fully autonomous. No human
+      intervention required.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary"
+         href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
+         target="_blank" rel="noopener noreferrer">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"
+             aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205
+                   11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015
+                   -2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72
+                   -1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015
+                   1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105
+                   -.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925
+                   0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18
+                   0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135
+                   3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12
+                   3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625
+                   -5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015
+                   2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0
+                   24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        View on GitHub
+      </a>
+
+      <a class="btn btn-secondary" href="#quickstart">
+        🚀 Quick Start
+      </a>
+
+      <a class="btn btn-secondary"
+         href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2/blob/main/README.md"
+         target="_blank" rel="noopener noreferrer">
+        📄 Full Docs
+      </a>
+    </div>
+
+    <div class="badges" aria-label="Tech badges">
+      <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white"
+           alt="Python 3.10+" />
+      <img src="https://img.shields.io/badge/Ollama-Remote%20%7C%20Local-10b981?style=flat-square"
+           alt="Ollama" />
+      <img src="https://img.shields.io/badge/Pydantic-v2-E92063?style=flat-square"
+           alt="Pydantic v2" />
+      <img src="https://img.shields.io/badge/RDKit-Cheminformatics-002366?style=flat-square"
+           alt="RDKit" />
+      <img src="https://img.shields.io/badge/ChromaDB-Vector%20Store-FF6B35?style=flat-square"
+           alt="ChromaDB" />
+      <img src="https://img.shields.io/badge/License-MIT-f5a623?style=flat-square"
+           alt="MIT License" />
+    </div>
   </div>
 </div>
 
 <hr class="divider" />
 
+<!-- ── Stats ────────────────────────────────────────── -->
+<section aria-labelledby="stats-heading">
+  <h2 id="stats-heading" class="sr-only">Pipeline at a Glance</h2>
+
+  <div class="stats reveal">
+    <div class="stat">
+      <span class="stat-number">7</span>
+      <span class="stat-label">Pipeline Stages</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">150</span>
+      <span class="stat-label">PubMed Abstracts</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">20</span>
+      <span class="stat-label">Molecules Generated</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">8K</span>
+      <span class="stat-label">Token Prompt Budget</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">0</span>
+      <span class="stat-label">Human Interventions</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
 <!-- ── Pipeline Stages ──────────────────────────────── -->
-<section id="pipeline">
-  <div class="section-label">Architecture</div>
-  <h2 class="section-title">Seven-Stage Pipeline</h2>
+<section id="pipeline" aria-labelledby="pipeline-heading">
+  <div class="section-label" aria-hidden="true">Architecture</div>
+  <h2 id="pipeline-heading" class="section-title">Seven-Stage Pipeline</h2>
   <p class="section-sub">
     Every inter-agent communication uses strict JSON validated against
     Pydantic schemas. No free-text is passed between stages.
@@ -527,61 +889,63 @@
 
   <div class="pipeline">
 
-    <div class="phase-card">
-      <div class="phase-icon">🗂️</div>
-      <div class="phase-number">PHASE 0</div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">🗂️</div>
+      <div class="phase-number">Phase 0</div>
       <h3>Planner</h3>
-      <p>Builds the task dependency graph and estimates pipeline duration
-         before any scientific work begins.</p>
-    </div>
+      <p>Builds the task dependency graph and estimates pipeline
+         duration before any scientific work begins.</p>
+    </article>
 
-    <div class="phase-card">
-      <div class="phase-icon">📚</div>
-      <div class="phase-number">PHASE 1</div>
-      <h3>Literature & Patent Retrieval</h3>
-      <p>Mines PubMed (up to 150 abstracts), arXiv preprints, and the
-         PatentsView API. Results are embedded into ChromaDB.</p>
-    </div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">📚</div>
+      <div class="phase-number">Phase 1</div>
+      <h3>Literature &amp; Patent Retrieval</h3>
+      <p>Mines PubMed (up to 150 abstracts), arXiv preprints, and
+         PatentsView API. Embeddings stored in ChromaDB.</p>
+    </article>
 
-    <div class="phase-card">
-      <div class="phase-icon">🎯</div>
-      <div class="phase-number">PHASE 2</div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">🎯</div>
+      <div class="phase-number">Phase 2</div>
       <h3>Hypothesis Generation</h3>
-      <p>Selects a primary biological target with UniProt/PDB IDs, proposes
-         a mechanistic hypothesis, and scores confidence.</p>
-    </div>
+      <p>Selects a primary biological target with UniProt / PDB IDs,
+         proposes a mechanistic hypothesis, and confidence-scores it.</p>
+    </article>
 
-    <div class="phase-card">
-      <div class="phase-icon">⚗️</div>
-      <div class="phase-number">PHASE 3</div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">⚗️</div>
+      <div class="phase-number">Phase 3</div>
       <h3>Molecule Design</h3>
-      <p>Generates up to 20 candidate molecules using RDKit, filters on
+      <p>Generates up to 20 candidate molecules via RDKit, filters on
          Lipinski rules, QED ≥ 0.5, and SA score ≤ 4.0.</p>
-    </div>
+    </article>
 
-    <div class="phase-card">
-      <div class="phase-icon">🔬</div>
-      <div class="phase-number">PHASE 4</div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">🔬</div>
+      <div class="phase-number">Phase 4</div>
       <h3>Docking Evaluation</h3>
-      <p>Runs AutoDock Vina on the top-5 shortlisted molecules against
-         the selected PDB structure, reporting ΔG and ligand efficiency.</p>
-    </div>
+      <p>Runs AutoDock Vina on the top-5 shortlisted molecules,
+         reporting ΔG (kcal/mol) and ligand efficiency.</p>
+    </article>
 
-    <div class="phase-card">
-      <div class="phase-icon">🧪</div>
-      <div class="phase-number">PHASE 5 (optional)</div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">🧪</div>
+      <div class="phase-number">Phase 5
+        <span class="phase-optional">optional</span>
+      </div>
       <h3>Synthesis Evaluation</h3>
-      <p>Computes RDKit SA scores and proposes step-by-step synthetic
-         routes for top-ranked molecules via LLM reasoning.</p>
-    </div>
+      <p>RDKit SA scores plus LLM-proposed step-by-step synthetic
+         routes for top-ranked molecules.</p>
+    </article>
 
-    <div class="phase-card">
-      <div class="phase-icon">📄</div>
-      <div class="phase-number">PHASE 6</div>
+    <article class="phase-card reveal">
+      <div class="phase-icon" aria-hidden="true">📄</div>
+      <div class="phase-number">Phase 6</div>
       <h3>Report Compilation</h3>
-      <p>Assembles all agent outputs into a structured Markdown (or PDF)
-         project proposal report, ready for scientific review.</p>
-    </div>
+      <p>Assembles all agent outputs into a structured Markdown (or
+         optional PDF) project proposal ready for review.</p>
+    </article>
 
   </div>
 </section>
@@ -589,55 +953,55 @@
 <hr class="divider" />
 
 <!-- ── Features ─────────────────────────────────────── -->
-<section id="features">
-  <div class="section-label">Features</div>
-  <h2 class="section-title">What's Inside</h2>
+<section id="features" aria-labelledby="features-heading">
+  <div class="section-label" aria-hidden="true">Features</div>
+  <h2 id="features-heading" class="section-title">What's Inside</h2>
   <p class="section-sub">
-    A full-stack cheminformatics and AI stack, all running locally on
-    your hardware.
+    A full-stack cheminformatics and AI stack running entirely on your
+    own hardware — no external AI APIs required.
   </p>
 
   <div class="features">
 
-    <div class="feature">
-      <div class="feature-icon">🤖</div>
+    <div class="feature reveal">
+      <span class="feature-icon" aria-hidden="true">🤖</span>
       <h3>Smart Ollama Routing</h3>
-      <p>Automatically tries your remote GPU server first, falls back to
-         local Ollama within 5 seconds — zero manual switching.</p>
+      <p>Automatically tries your remote GPU server first, falls back
+         to local Ollama within 5 seconds — zero manual switching.</p>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">✅</div>
+    <div class="feature reveal">
+      <span class="feature-icon" aria-hidden="true">✅</span>
       <h3>Strict JSON Validation</h3>
-      <p>All inter-agent messages are validated against Pydantic v2 schemas
+      <p>All inter-agent messages validated against Pydantic v2 schemas
          with up to 3 automatic retries on parse failures.</p>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">🧬</div>
+    <div class="feature reveal">
+      <span class="feature-icon" aria-hidden="true">🧬</span>
       <h3>Real Cheminformatics</h3>
-      <p>RDKit-powered molecule generation, Lipinski filtering, QED scoring,
-         and synthetic accessibility checks — not toy examples.</p>
+      <p>RDKit-powered molecule generation, Lipinski filtering, QED
+         scoring, and synthetic accessibility checks.</p>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">📐</div>
+    <div class="feature reveal">
+      <span class="feature-icon" aria-hidden="true">📐</span>
       <h3>Token Budget Management</h3>
-      <p>8,000-token prompt budget with HuggingFace tokenizer primary and
-         tiktoken fallback. Automatic chunking for large literature sets.</p>
+      <p>8,000-token prompt budget with HuggingFace tokenizer primary
+         and tiktoken fallback. Auto-chunking for large literature.</p>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">🔌</div>
+    <div class="feature reveal">
+      <span class="feature-icon" aria-hidden="true">🔌</span>
       <h3>External API Integration</h3>
       <p>PubMed ESearch/EFetch, arXiv, PatentsView, UniProt REST, and
-         RCSB PDB — all wired up and ready to go.</p>
+         RCSB PDB — all wired up out of the box.</p>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">🐳</div>
+    <div class="feature reveal">
+      <span class="feature-icon" aria-hidden="true">🐳</span>
       <h3>Docker Support</h3>
-      <p>Dockerfile and docker-compose included for reproducible
+      <p>Dockerfile and docker-compose included for fully reproducible
          deployment across any environment.</p>
     </div>
 
@@ -647,63 +1011,115 @@
 <hr class="divider" />
 
 <!-- ── Quick Start ──────────────────────────────────── -->
-<section id="quickstart">
-  <div class="section-label">Quick Start</div>
-  <h2 class="section-title">Up and Running in Minutes</h2>
+<section id="quickstart" aria-labelledby="qs-heading">
+  <div class="section-label" aria-hidden="true">Quick Start</div>
+  <h2 id="qs-heading" class="section-title">Up and Running in Minutes</h2>
   <p class="section-sub">
-    Clone, configure your Ollama endpoint, and run.
+    Clone, point to your Ollama endpoint, and run — that's it.
   </p>
 
-  <div class="code-section">
-    <div class="code-tabs">
-      <button class="code-tab active" onclick="switchTab(event, 'install')">
-        Install
+  <div class="code-section reveal">
+    <!-- Tab bar -->
+    <div class="code-tabs" role="tablist" aria-label="Quick start steps">
+      <button class="code-tab active" role="tab"
+              aria-selected="true" aria-controls="tab-install"
+              onclick="switchTab(event,'install')">
+        📦 Install
       </button>
-      <button class="code-tab" onclick="switchTab(event, 'run')">
-        Run
+      <button class="code-tab" role="tab"
+              aria-selected="false" aria-controls="tab-run"
+              onclick="switchTab(event,'run')">
+        ▶️ Run
       </button>
-      <button class="code-tab" onclick="switchTab(event, 'ollama')">
-        Ollama Setup
+      <button class="code-tab" role="tab"
+              aria-selected="false" aria-controls="tab-ollama"
+              onclick="switchTab(event,'ollama')">
+        🦙 Ollama Setup
+      </button>
+      <button class="code-tab" role="tab"
+              aria-selected="false" aria-controls="tab-docker"
+              onclick="switchTab(event,'docker')">
+        🐳 Docker
       </button>
     </div>
 
-    <div class="code-content">
+    <!-- Install -->
+    <div id="tab-install" class="tab-panel active" role="tabpanel">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn"
+                onclick="copyCode(this)"
+                data-code="git clone https://github.com/2am-dev/Drug-Discovery-Pipeline-V2.git
+cd Drug-Discovery-Pipeline-V2
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env">
+          📋 Copy
+        </button>
+      </div>
+      <div class="code-body">
+        <pre><span class="c-comment"># Clone the repository</span>
+<span class="c-cmd">git clone</span> <span class="c-string">https://github.com/2am-dev/Drug-Discovery-Pipeline-V2.git</span>
+<span class="c-cmd">cd</span> Drug-Discovery-Pipeline-V2
 
-      <!-- Install Tab -->
-      <div class="tab-panel active" id="tab-install">
-        <pre><span class="c-comment"># 1. Clone and create virtual environment</span>
-<span class="c-cmd">git clone</span> <span class="c-string">https://github.com/your-username/drug_discovery_pipeline.git</span>
-<span class="c-cmd">cd</span> drug_discovery_pipeline
+<span class="c-comment"># Create and activate virtual environment</span>
 <span class="c-cmd">python -m venv</span> .venv
-<span class="c-cmd">source</span> .venv/bin/activate    <span class="c-comment"># Windows: .venv\Scripts\activate</span>
+<span class="c-cmd">source</span> .venv/bin/activate   <span class="c-comment"># Windows: .venv\Scripts\activate</span>
+
+<span class="c-comment"># Install dependencies</span>
 <span class="c-cmd">pip install -r</span> requirements.txt
 
-<span class="c-comment"># 2. Configure environment</span>
+<span class="c-comment"># Copy and edit environment config</span>
 <span class="c-cmd">cp</span> .env.example .env
-<span class="c-comment"># Edit .env → set OLLAMA_REMOTE_URL to your server IP</span></pre>
+<span class="c-comment"># → Edit .env and set OLLAMA_REMOTE_URL to your server</span></pre>
       </div>
+    </div>
 
-      <!-- Run Tab -->
-      <div class="tab-panel" id="tab-run">
-        <pre><span class="c-comment"># Disease indication (basic)</span>
+    <!-- Run -->
+    <div id="tab-run" class="tab-panel" role="tabpanel">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)"
+                data-code='python main.py --indication "non-small cell lung cancer"'>
+          📋 Copy
+        </button>
+      </div>
+      <div class="code-body">
+        <pre><span class="c-comment"># Basic run — disease indication</span>
 <span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"non-small cell lung cancer"</span>
 
-<span class="c-comment"># Specific target with alternative model</span>
+<span class="c-comment"># Specific biological target with alternative model</span>
 <span class="c-cmd">python main.py</span> <span class="c-flag">--target</span> EGFR <span class="c-flag">--model</span> gemma2:27b
 
-<span class="c-comment"># Full run with synthesis evaluation enabled</span>
+<span class="c-comment"># Full run with synthesis evaluation</span>
 <span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"Alzheimer's disease"</span> <span class="c-flag">--enable-synthesis</span>
 
-<span class="c-comment"># Local Ollama only (skip remote server)</span>
+<span class="c-comment"># Local Ollama only — skip remote server</span>
 <span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"KRAS-driven pancreatic cancer"</span> <span class="c-flag">--local-only</span>
 
-<span class="c-comment"># Fast debug run (no docking, no patents)</span>
-<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"Type 2 diabetes"</span> <span class="c-flag">--no-docking --no-patents</span></pre>
-      </div>
+<span class="c-comment"># Fast debug run — skip docking and patents</span>
+<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"Type 2 diabetes"</span> <span class="c-flag">--no-docking --no-patents</span>
 
-      <!-- Ollama Tab -->
-      <div class="tab-panel" id="tab-ollama">
-        <pre><span class="c-comment"># On your remote GPU server</span>
+<span class="c-comment"># Verbose debug output</span>
+<span class="c-cmd">python main.py</span> <span class="c-flag">--indication</span> <span class="c-string">"NSCLC"</span> <span class="c-flag">--log-level</span> DEBUG</pre>
+      </div>
+    </div>
+
+    <!-- Ollama -->
+    <div id="tab-ollama" class="tab-panel" role="tabpanel">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)"
+                data-code="curl -fsSL https://ollama.ai/install.sh | sh
+ollama pull gemma4:31b-it-q8_0
+ollama pull nomic-embed-text
+OLLAMA_HOST=0.0.0.0:11434 ollama serve">
+          📋 Copy
+        </button>
+      </div>
+      <div class="code-body">
+        <pre><span class="c-comment"># ── Remote GPU server setup ───────────────────────</span>
 <span class="c-cmd">curl -fsSL</span> https://ollama.ai/install.sh | sh
 
 <span class="c-comment"># Pull required models</span>
@@ -711,44 +1127,146 @@
 <span class="c-cmd">ollama pull</span> gemma4:26b-a4b-it-q8_0   <span class="c-comment"># Alternative  (~16 GB)</span>
 <span class="c-cmd">ollama pull</span> nomic-embed-text          <span class="c-comment"># Embeddings   (~274 MB)</span>
 
-<span class="c-comment"># Start server with external access</span>
-OLLAMA_HOST=0.0.0.0:11434 <span class="c-cmd">ollama serve</span>
+<span class="c-comment"># Expose on network (trusted network / VPN only)</span>
+<span class="c-key">OLLAMA_HOST</span>=<span class="c-val">0.0.0.0:11434</span> <span class="c-cmd">ollama serve</span>
 
-<span class="c-comment"># Set in .env</span>
-OLLAMA_REMOTE_URL=http://192.168.1.100:11434/v1</pre>
+<span class="c-comment"># ── .env configuration ───────────────────────────</span>
+<span class="c-key">OLLAMA_REMOTE_URL</span>=<span class="c-val">http://192.168.1.100:11434/v1</span>
+
+<span class="c-comment"># ── Local fallback (RTX 5070 Ti) ─────────────────</span>
+<span class="c-cmd">ollama serve</span>   <span class="c-comment"># Listens on localhost:11434 by default</span></pre>
       </div>
+    </div>
 
+    <!-- Docker -->
+    <div id="tab-docker" class="tab-panel" role="tabpanel">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)"
+                data-code="docker compose up --build">
+          📋 Copy
+        </button>
+      </div>
+      <div class="code-body">
+        <pre><span class="c-comment"># Build and start all services</span>
+<span class="c-cmd">docker compose up</span> --build
+
+<span class="c-comment"># Run a single pipeline job inside the container</span>
+<span class="c-cmd">docker compose run</span> pipeline \
+  <span class="c-flag">--indication</span> <span class="c-string">"non-small cell lung cancer"</span>
+
+<span class="c-comment"># Stop and remove containers</span>
+<span class="c-cmd">docker compose down</span></pre>
+      </div>
+    </div>
+
+  </div><!-- /.code-section -->
+</section>
+
+<hr class="divider" />
+
+<!-- ── Connectivity Flow ─────────────────────────── -->
+<section id="routing" aria-labelledby="routing-heading">
+  <div class="section-label" aria-hidden="true">Connectivity</div>
+  <h2 id="routing-heading" class="section-title">Automatic Failover</h2>
+  <p class="section-sub">
+    The pipeline health-checks your remote server first and silently
+    falls back to local Ollama if unavailable — configurable timeout.
+  </p>
+
+  <div class="flow-box reveal">
+    <div class="flow-row">
+      <span class="badge badge-blue">1</span>
+      Remote Ollama &nbsp;<code>OLLAMA_REMOTE_URL</code>&nbsp;
+      — tried first
+    </div>
+    <div class="flow-connector">
+      │ &nbsp;timeout or connection refused (default 5 s)<br/>▼
+    </div>
+
+    <div class="flow-row">
+      <span class="badge badge-yellow">2</span>
+      Local Ollama &nbsp;<code>localhost:11434</code>&nbsp;
+      — automatic fallback
+    </div>
+    <div class="flow-connector">
+      │ &nbsp;also unreachable<br/>▼
+    </div>
+
+    <div class="flow-row">
+      <span class="badge badge-red">✕</span>
+      <code>RuntimeError: No Ollama endpoint available</code>
+      — pipeline aborted
     </div>
   </div>
 </section>
 
 <hr class="divider" />
 
-<!-- ── Ollama Routing ────────────────────────────────── -->
-<section id="routing">
-  <div class="section-label">Connectivity</div>
-  <h2 class="section-title">Automatic Failover</h2>
+<!-- ── Token Budget ──────────────────────────────── -->
+<section id="tokens" aria-labelledby="token-heading">
+  <div class="section-label" aria-hidden="true">Performance</div>
+  <h2 id="token-heading" class="section-title">Token Budget</h2>
   <p class="section-sub">
-    The pipeline tries your remote server first and silently falls back
-    to local Ollama if the remote is unreachable.
+    Operates within a strict 8,000-token prompt budget, leaving ~24,000
+    tokens of headroom for model reasoning inside Gemma4's 32K window.
   </p>
 
-  <div class="flow-box">
-    <div class="flow-step">
-      <span class="flow-badge">1</span>
-      Remote Ollama &nbsp;<code>OLLAMA_REMOTE_URL</code>&nbsp; ← tried first
+  <div class="budget-bar-wrap reveal">
+    <p style="font-size:.875rem; color:var(--text-muted); margin-bottom:.5rem;">
+      32,000 token context window breakdown
+    </p>
+
+    <div style="margin: 1rem 0;">
+      <div style="font-size:.82rem; color:var(--text-muted);
+                  margin-bottom:.4rem; display:flex;
+                  justify-content:space-between;">
+        <span>Prompt budget</span><span>8,000 tokens (25%)</span>
+      </div>
+      <div class="budget-bar">
+        <div class="budget-fill" style="width:0%" id="bar-prompt"
+             role="progressbar" aria-valuenow="25"
+             aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
     </div>
-    <div class="flow-arrow">│ &nbsp;timeout or connection error (5 s)</div>
-    <div class="flow-arrow">▼</div>
-    <div class="flow-step">
-      <span class="flow-badge fallback">2</span>
-      Local Ollama &nbsp;<code>localhost:11434</code>&nbsp; ← automatic fallback
+
+    <div style="margin: 1rem 0;">
+      <div style="font-size:.82rem; color:var(--text-muted);
+                  margin-bottom:.4rem; display:flex;
+                  justify-content:space-between;">
+        <span>Model reasoning headroom</span><span>24,000 tokens (75%)</span>
+      </div>
+      <div class="budget-bar">
+        <div class="budget-fill"
+             style="width:0%; background:linear-gradient(90deg,#1f6feb,#58a6ff);"
+             id="bar-model" role="progressbar" aria-valuenow="75"
+             aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
     </div>
-    <div class="flow-arrow">│ &nbsp;also unreachable</div>
-    <div class="flow-arrow">▼</div>
-    <div class="flow-step">
-      <span class="flow-badge error">3</span>
-      <code>RuntimeError</code> raised — pipeline aborted
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+                gap:.75rem; margin-top:1.5rem; font-size:.82rem;">
+      <div style="background:var(--surface2); border:1px solid var(--border);
+                  border-radius:var(--radius-sm); padding:.75rem;">
+        <div style="color:var(--text-muted); margin-bottom:.2rem;">
+          Input &lt; 7,500 tokens
+        </div>
+        <div style="font-weight:600;">Pass directly to LLM</div>
+      </div>
+      <div style="background:var(--surface2); border:1px solid var(--border);
+                  border-radius:var(--radius-sm); padding:.75rem;">
+        <div style="color:var(--text-muted); margin-bottom:.2rem;">
+          7,500 – 8,000 tokens
+        </div>
+        <div style="font-weight:600;">Trim least-critical fields</div>
+      </div>
+      <div style="background:var(--surface2); border:1px solid var(--border);
+                  border-radius:var(--radius-sm); padding:.75rem;">
+        <div style="color:var(--text-muted); margin-bottom:.2rem;">
+          &gt; 8,000 tokens
+        </div>
+        <div style="font-weight:600;">Summarise + compress</div>
+      </div>
     </div>
   </div>
 </section>
@@ -756,16 +1274,16 @@ OLLAMA_REMOTE_URL=http://192.168.1.100:11434/v1</pre>
 <hr class="divider" />
 
 <!-- ── Configuration ────────────────────────────────── -->
-<section id="config">
-  <div class="section-label">Configuration</div>
-  <h2 class="section-title">Key Environment Variables</h2>
+<section id="config" aria-labelledby="config-heading">
+  <div class="section-label" aria-hidden="true">Configuration</div>
+  <h2 id="config-heading" class="section-title">Environment Variables</h2>
   <p class="section-sub">
-    All settings are controlled via <code>.env</code> or exported
-    environment variables.
+    All settings controlled via <code>.env</code> or exported shell
+    variables. Copy <code>.env.example</code> to get started.
   </p>
 
-  <div class="code-section">
-    <table class="config-table">
+  <div class="table-wrap reveal">
+    <table>
       <thead>
         <tr>
           <th>Variable</th>
@@ -777,22 +1295,32 @@ OLLAMA_REMOTE_URL=http://192.168.1.100:11434/v1</pre>
         <tr>
           <td><code>OLLAMA_REMOTE_URL</code></td>
           <td><code>http://remote:11434/v1</code></td>
-          <td>Remote Ollama endpoint</td>
+          <td>Remote Ollama endpoint (tried first)</td>
+        </tr>
+        <tr>
+          <td><code>OLLAMA_LOCAL_URL</code></td>
+          <td><code>http://localhost:11434/v1</code></td>
+          <td>Local Ollama fallback endpoint</td>
+        </tr>
+        <tr>
+          <td><code>OLLAMA_HEALTH_TIMEOUT</code></td>
+          <td><code>5</code></td>
+          <td>Health-check timeout in seconds</td>
         </tr>
         <tr>
           <td><code>LLM_MODEL</code></td>
           <td><code>gemma4:31b-it-q8_0</code></td>
-          <td>Primary LLM model</td>
-        </tr>
-        <tr>
-          <td><code>MAX_CONTEXT_TOKENS</code></td>
-          <td><code>8000</code></td>
-          <td>Max tokens per LLM prompt</td>
+          <td>Primary LLM model identifier</td>
         </tr>
         <tr>
           <td><code>LLM_JSON_TEMPERATURE</code></td>
           <td><code>0.2</code></td>
           <td>Temperature for JSON-strict calls</td>
+        </tr>
+        <tr>
+          <td><code>MAX_CONTEXT_TOKENS</code></td>
+          <td><code>8000</code></td>
+          <td>Max tokens per LLM prompt</td>
         </tr>
         <tr>
           <td><code>PUBMED_MAX_RESULTS</code></td>
@@ -817,12 +1345,17 @@ OLLAMA_REMOTE_URL=http://192.168.1.100:11434/v1</pre>
         <tr>
           <td><code>ENABLE_CHEMICAL_SYNTHESIS</code></td>
           <td><code>false</code></td>
-          <td>Enable synthesis route evaluation</td>
+          <td>Enable synthesis route evaluation phase</td>
         </tr>
         <tr>
           <td><code>ENABLE_PDF_REPORT</code></td>
           <td><code>false</code></td>
-          <td>Generate PDF alongside Markdown</td>
+          <td>Generate PDF alongside Markdown report</td>
+        </tr>
+        <tr>
+          <td><code>ENABLE_LLM_CACHE</code></td>
+          <td><code>false</code></td>
+          <td>Cache LLM responses to disk</td>
         </tr>
       </tbody>
     </table>
@@ -832,31 +1365,114 @@ OLLAMA_REMOTE_URL=http://192.168.1.100:11434/v1</pre>
 <!-- ── Footer ───────────────────────────────────────── -->
 <footer>
   <p>
-    Built with
-    <a href="https://ollama.ai" target="_blank">Ollama</a> ·
-    <a href="https://ai.google.dev/gemma" target="_blank">Gemma 4</a> ·
-    <a href="https://www.rdkit.org" target="_blank">RDKit</a> ·
-    <a href="https://www.trychroma.com" target="_blank">ChromaDB</a> ·
-    <a href="https://docs.pydantic.dev" target="_blank">Pydantic v2</a>
-  </p>
-  <p style="margin-top:0.5rem;">
-    <a href="https://github.com/your-username/drug_discovery_pipeline"
-       target="_blank">GitHub</a>
+    <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2"
+       target="_blank" rel="noopener noreferrer">Drug Discovery Pipeline V2</a>
     &nbsp;·&nbsp;
-    <a href="https://github.com/your-username/drug_discovery_pipeline/blob/main/LICENSE"
-       target="_blank">MIT License</a>
+    <a href="https://github.com/2am-dev/Drug-Discovery-Pipeline-V2/blob/main/LICENSE"
+       target="_blank" rel="noopener noreferrer">MIT License</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/2am-dev" target="_blank"
+       rel="noopener noreferrer">@2am-dev</a>
   </p>
+
+  <div class="footer-stack" role="list" aria-label="Tech stack">
+    <a class="stack-pill" href="https://ollama.ai"
+       target="_blank" rel="noopener noreferrer" role="listitem">
+       🦙 Ollama
+    </a>
+    <a class="stack-pill" href="https://ai.google.dev/gemma"
+       target="_blank" rel="noopener noreferrer" role="listitem">
+       💎 Gemma 4
+    </a>
+    <a class="stack-pill" href="https://www.rdkit.org"
+       target="_blank" rel="noopener noreferrer" role="listitem">
+       🧪 RDKit
+    </a>
+    <a class="stack-pill" href="https://www.trychroma.com"
+       target="_blank" rel="noopener noreferrer" role="listitem">
+       🗄️ ChromaDB
+    </a>
+    <a class="stack-pill" href="https://docs.pydantic.dev"
+       target="_blank" rel="noopener noreferrer" role="listitem">
+       ✅ Pydantic v2
+    </a>
+    <a class="stack-pill"
+       href="https://autodock-vina.readthedocs.io"
+       target="_blank" rel="noopener noreferrer" role="listitem">
+       🔬 AutoDock Vina
+    </a>
+  </div>
 </footer>
 
-<script>
-  function switchTab(event, tabId) {
-    // Deactivate all tabs and panels
-    document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+<!-- Back to top -->
+<button id="btt" aria-label="Back to top" onclick="scrollToTop()">↑</button>
 
-    // Activate selected
-    event.currentTarget.classList.add('active');
-    document.getElementById('tab-' + tabId).classList.add('active');
+<script>
+  /* ── Tab switching ─────────────────────────────── */
+  function switchTab(evt, id) {
+    const section = evt.currentTarget.closest('.code-section');
+    section.querySelectorAll('.code-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    section.querySelectorAll('.tab-panel').forEach(p =>
+      p.classList.remove('active')
+    );
+    evt.currentTarget.classList.add('active');
+    evt.currentTarget.setAttribute('aria-selected', 'true');
+    section.querySelector('#tab-' + id).classList.add('active');
+  }
+
+  /* ── Copy to clipboard ─────────────────────────── */
+  function copyCode(btn) {
+    const text = btn.getAttribute('data-code');
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✅ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      btn.textContent = '❌ Failed';
+      setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+    });
+  }
+
+  /* ── Scroll-reveal ─────────────────────────────── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── Budget bar animation ──────────────────────── */
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.getElementById('bar-prompt').style.width = '25%';
+        document.getElementById('bar-model').style.width  = '75%';
+        barObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const budgetWrap = document.querySelector('.budget-bar-wrap');
+  if (budgetWrap) barObserver.observe(budgetWrap);
+
+  /* ── Back to top ───────────────────────────────── */
+  const btt = document.getElementById('btt');
+  window.addEventListener('scroll', () => {
+    btt.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
 
