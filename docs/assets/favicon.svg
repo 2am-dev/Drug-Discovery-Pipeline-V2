@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background pill -->
+  <rect width="32" height="32" rx="8" fill="#020408"/>
+
+  <!-- Molecule nodes -->
+  <circle cx="16" cy="16" r="4"   fill="#00d084"/>
+  <circle cx="7"  cy="10" r="2.5" fill="#3b82f6"/>
+  <circle cx="25" cy="10" r="2.5" fill="#a855f7"/>
+  <circle cx="7"  cy="22" r="2.5" fill="#22d3ee"/>
+  <circle cx="25" cy="22" r="2.5" fill="#3b82f6"/>
+
+  <!-- Bonds -->
+  <line x1="16" y1="16" x2="7"  y2="10" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.35"/>
+  <line x1="16" y1="16" x2="25" y2="10" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.35"/>
+  <line x1="16" y1="16" x2="7"  y2="22" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.35"/>
+  <line x1="16" y1="16" x2="25" y2="22" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.35"/>
+</svg>
