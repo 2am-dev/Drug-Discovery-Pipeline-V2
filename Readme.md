@@ -27,29 +27,7 @@ indication** or **biological target** as input and produces a comprehensive
 
 ## Architecture Overview
 
-```
-User Input (disease / target)
-        │
-        ▼
-┌───────────────┐    JSON     ┌─────────────────┐    JSON    ┌──────────────────┐
-│    Planner    │──────────▶│    Retriever     │──────────▶│   Hypothesis     │
-│  (task graph) │            │ (lit + patents)  │            │  (target select) │
-└───────────────┘            └─────────────────┘            └──────────────────┘
-                                                                      │
-                              ┌───────────────────────────────────────┘
-                              ▼
-                    ┌──────────────────┐    JSON    ┌──────────────────┐
-                    │ Molecule Designer│──────────▶│ Docking Evaluator│
-                    │  (SMILES + props)│            │  (Vina / mock)   │
-                    └──────────────────┘            └──────────────────┘
-                                                             │
-                              ┌──────────────────────────────┘
-                              ▼
-                    ┌──────────────────┐    JSON    ┌──────────────────┐
-                    │ Synthesis Eval.  │──────────▶│ Report Compiler  │
-                    │  (OPTIONAL)      │            │  (MD / PDF)      │
-                    └──────────────────┘            └──────────────────┘
-```
+![Drug Discovery Workflow](./assets/Gemini_Generated_Image_crxokrcrxokrcrxo.png)
 
 Every inter-agent communication uses **strict JSON** validated against Pydantic
 schemas. No free-text is passed between stages.
